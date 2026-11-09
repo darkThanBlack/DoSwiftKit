@@ -83,17 +83,17 @@ extension DO {
             setvbuf(stdout, nil, _IOFBF, Int(BUFSIZ))
             setvbuf(stderr, nil, _IOFBF, Int(BUFSIZ))
 
-            for stream in streams {
-                guard stream.original >= 0 else { continue }
-                dup2(stream.original, stream.fd)
-                close(stream.original)
-            }
-
             queue.sync {
                 for stream in streams {
                     drain(stream.source)
                     flushTail(of: stream)
                 }
+            }
+
+            for stream in streams {
+                guard stream.original >= 0 else { continue }
+                dup2(stream.original, stream.fd)
+                close(stream.original)
             }
 
             for stream in streams { stream.dispatchSource?.cancel() }
@@ -109,8 +109,6 @@ extension DO {
             let original = dup(fd)
 
             _ = fcntl(writeEnd, F_SETNOSIGPIPE, 1)
-            if original >= 0 { _ = fcntl(original, F_SETNOSIGPIPE, 1) }
-
             _ = fcntl(readEnd, F_SETFL, O_NONBLOCK)
 
             setvbuf(stdout, nil, _IOLBF, 0)
@@ -119,6 +117,17 @@ extension DO {
             dup2(writeEnd, fd)
 
             close(writeEnd)
+
+            // Only touch `original` after fd stops sharing its open file description, so a
+            // concurrent write to fd is never made non-blocking underneath it.
+            if original >= 0 {
+                _ = fcntl(original, F_SETNOSIGPIPE, 1)
+
+                // The mirror write must never block the capture queue: if the original
+                // consumer is gone or slow, the chunk is dropped instead.
+                let flags = fcntl(original, F_GETFL)
+                if flags >= 0 { _ = fcntl(original, F_SETFL, flags | O_NONBLOCK) }
+            }
 
             let stream = Stream(fd: fd, source: source, original: original, readEnd: readEnd)
             let dispatchSource = DispatchSource.makeReadSource(fileDescriptor: readEnd, queue: queue)
@@ -138,6 +147,9 @@ extension DO {
             while true {
                 let count = read(stream.readEnd, &buffer, buffer.count)
                 guard count > 0 else { break }
+
+                // Keep the host's own consumer (Xcode's console, a terminal, a file) alive.
+                Self.mirror(buffer, count: count, to: stream.original)
 
                 stream.pending.append(contentsOf: buffer[0..<count])
                 emitLines(from: stream)
@@ -197,6 +209,23 @@ extension DO {
         private static func startsWithCloser(_ text: String) -> Bool {
             guard let first = text.first(where: { !$0.isWhitespace }) else { return false }
             return first == ")" || first == "}" || first == "]"
+        }
+
+        /// Best-effort tee back to the descriptor the host originally had. A dead or full
+        /// pipe must not stall capture, so a failed write simply drops the rest of the chunk.
+        static func mirror(_ bytes: [UInt8], count: Int, to fd: Int32) {
+            guard fd >= 0, count > 0, count <= bytes.count else { return }
+
+            bytes.withUnsafeBytes { raw in
+                guard let base = raw.baseAddress else { return }
+
+                var offset = 0
+                while offset < count {
+                    let written = write(fd, base.advanced(by: offset), count - offset)
+                    if written <= 0 { break }
+                    offset += written
+                }
+            }
         }
 
         private func flushTail(of stream: Stream) {

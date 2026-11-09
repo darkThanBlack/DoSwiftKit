@@ -192,6 +192,6 @@ swift build --triple arm64-apple-ios13.0-simulator --sdk "$SDK"
 
 ## 已知限制
 
-- Console 的 stdout / stderr 只能看到「管道接上之后」的输出；Unified Log 需要 iOS 15。
+- Console 的 stdout / stderr 只能看到「管道接上之后」的输出，并且会原样回写到原描述符（Xcode 控制台仍可见）；Unified Log 需要 iOS 15。
 - Network 只覆盖 `URLSession`：WKWebView / WebSocket / 裸 socket 抓不到，`httpBodyStream`
   上传抓不到。

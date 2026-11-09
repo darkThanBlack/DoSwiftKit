@@ -25,8 +25,9 @@ extension DO {
 
         private let list = DO.ConsoleViewController()
 
-        /// Attaches the pipe now. Opt-in: it takes over fd 1 and fd 2, so output stops going
-        /// wherever it went before. Opening the panel alone does not start it.
+        /// Attaches the pipe now. Opt-in: fd 1 and fd 2 are mirrored into the panel while the
+        /// bytes are still forwarded to their original destination. Opening the panel alone
+        /// does not start it.
         public func start() {
             DO.ConsoleStore.shared.startCollecting()
         }
