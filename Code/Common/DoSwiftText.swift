@@ -297,6 +297,14 @@ extension DO.Text {
     enum Hierarchy {
         static let pluginTitle = DO.Text.string("hierarchy.title", "Hierarchy")
         static let detailTitle = DO.Text.string("hierarchy.detail_title", "UI Structure")
+        static let segmentProperties = DO.Text.string("hierarchy.segment.properties", "Properties")
+        static let segmentGeometry = DO.Text.string("hierarchy.segment.geometry", "Geometry")
+        static let segmentAutoLayout = DO.Text.string("hierarchy.segment.autolayout", "Auto Layout")
+        static let sectionCommon = DO.Text.string("hierarchy.section.common", "Common")
+        static let sectionConstraints = DO.Text.string("hierarchy.section.constraints", "Constraints")
+        static let sectionDiagnostics = DO.Text.string("hierarchy.section.diagnostics", "Diagnostics")
+        static let sectionEffective = DO.Text.string("hierarchy.section.effective", "Effective Values")
+        static let sectionTraits = DO.Text.string("hierarchy.section.traits", "Traits & RTL")
         static let infoTitle = DO.Text.string("hierarchy.info_title", "UI Hierarchy")
         static let never = DO.Text.string("hierarchy.visibility.never", "Never")
         static let whileDragging = DO.Text.string("hierarchy.visibility.while_dragging", "While Dragging")
@@ -340,9 +348,6 @@ extension DO.Text {
         static let constraintPriority = DO.Text.string("hierarchy.constraints.priority", "Priority")
         static let constraintEmpty = DO.Text.string("hierarchy.constraints.empty", "No constraints involve this view.")
         static let constraintInactive = DO.Text.string("hierarchy.constraints.inactive", "inactive")
-        static func constraintSection(_ count: Int) -> String {
-            return DO.Text.format("hierarchy.constraints.section", "Constraints (%d)", count)
-        }
         static func characterAndLineCount(_ characters: Int, _ lines: Int) -> String {
             return DO.Text.format("hierarchy.editor.count", "%1$d characters · %2$d lines", characters, lines)
         }

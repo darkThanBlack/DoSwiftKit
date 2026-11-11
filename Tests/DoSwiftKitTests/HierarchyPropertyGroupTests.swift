@@ -20,7 +20,7 @@ final class HierarchyPropertyGroupTests: XCTestCase {
         let stack = UIStackView()
         let models = DO.HierarchyPropertyEngine.shared.categoryModels(for: stack)
 
-        let stackSection = models.first { $0.title == "Stack" }
+        let stackSection = models.first { $0.title == "UIStackView" }
         XCTAssertNotNil(stackSection)
 
         let axis = stackSection?.items.first { $0.title == "axis" }
@@ -34,17 +34,16 @@ final class HierarchyPropertyGroupTests: XCTestCase {
 
     func testTranslatesAutoresizingMaskIsExposed() {
         let view = UIView()
-        let models = DO.HierarchyPropertyEngine.shared.categoryModels(for: view)
-        let row = models.flatMap(\.items)
-            .first { $0.title == "translatesAutoresizingMaskIntoConstraints" }
+        let rows = DO.HierarchyBuiltinSections.autoLayoutSections(for: view).flatMap(\.rows)
+        let row = rows.first { $0.title == "translatesAutoresizingMaskIntoConstraints" }
 
-        XCTAssertEqual(row?.detailTitle, "true")
-        XCTAssertNotNil(row?.edit)
+        XCTAssertEqual(row?.detail, "true")
+        XCTAssertNotNil(row?.write)
     }
 
     func testNonStackViewHasNoStackGroup() {
         let view = UIView()
         let models = DO.HierarchyPropertyEngine.shared.categoryModels(for: view)
-        XCTAssertFalse(models.contains { $0.title == "Stack" })
+        XCTAssertFalse(models.contains { $0.title == "UIStackView" })
     }
 }

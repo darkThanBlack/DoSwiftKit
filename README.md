@@ -98,7 +98,7 @@ DO.ConsolePlugin.shared.start()
   * [x] Colour picker / view inspector / alignment ruler / layout borders / UI hierarchy
 * [x] Rewritten view lookup; the overlay no longer blocks the host app
 * [x] A large amount of boilerplate removed
-  * [x] The original synthesized every property in Objective-C; it is now rendered from JSON
+  * [x] The original synthesized every property in Objective-C; the fixed base layer is plain code, subclass extras come from JSON
 * [x] Edit object properties live
   * [x] Redesigned the editor UI and the set of editable properties
   * [x] Frame / bounds / center editing, through the same editor as every other value

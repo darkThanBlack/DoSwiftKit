@@ -18,29 +18,68 @@ extension DO {
 
         weak var selectView: UIView?
 
+        private enum Tab: Int {
+            case properties
+            case geometry
+            case autoLayout
+        }
+
+        private var selectedTab: Tab = .properties
+
+        private lazy var segments: UISegmentedControl = {
+            let control = UISegmentedControl(items: [DO.Text.Hierarchy.segmentProperties,
+                                                     DO.Text.Hierarchy.segmentGeometry,
+                                                     DO.Text.Hierarchy.segmentAutoLayout])
+            control.selectedSegmentIndex = Tab.properties.rawValue
+            control.addTarget(self, action: #selector(segmentChanged), for: .valueChanged)
+            return control
+        }()
+
         override func viewDidLoad() {
             super.viewDidLoad()
 
             title = DO.Text.Hierarchy.detailTitle
+            navigationItem.titleView = segments
 
             loadData()
 
         }
 
-        // Property lists come from DO.HierarchyPropertyEngine (JSON-driven).
+        @objc private func segmentChanged() {
+            selectedTab = Tab(rawValue: segments.selectedSegmentIndex) ?? .properties
+            loadData()
+        }
+
         private func loadData() {
             guard let view = selectView else { return }
 
-            let models = DO.HierarchyPropertyEngine.shared.categoryModels(for: view)
+            switch selectedTab {
+            case .properties:
+                var result = DO.HierarchyBuiltinSections.propertySections(for: view)
+                    .map { builtinSection($0) }
+                result += DO.HierarchyPropertyEngine.shared.categoryModels(for: view)
+                    .map { jsonSection($0) }
+                // Most-derived first: subclass, then UIView, then NSObject.
+                sections = Array(result.reversed())
 
-            var result: [Section] = models.map { model in
-                Section(title: model.title, rows: model.items.map { row(for: $0) })
+            case .geometry:
+                sections = DO.HierarchyBuiltinSections.geometrySections(for: view)
+                    .map { builtinSection($0) }
+
+            case .autoLayout:
+                var result = DO.HierarchyBuiltinSections.autoLayoutSections(for: view)
+                    .map { builtinSection($0) }
+                result.insert(constraintSection(for: view), at: min(1, result.count))
+                sections = result
             }
+        }
 
-            // Constraints are a runtime set, so they sit right after the first JSON group
-            // instead of being declared in the JSON.
-            result.insert(constraintSection(for: view), at: min(1, result.count))
-            sections = result
+        private func builtinSection(_ section: DO.HierarchyBuiltinSection) -> Section {
+            return Section(title: section.title, rows: section.rows.map { row(for: $0) })
+        }
+
+        private func jsonSection(_ model: DO.HierarchyCategoryModel) -> Section {
+            return Section(title: model.title, rows: model.items.map { row(for: $0) })
         }
 
         private func constraintSection(for view: UIView) -> Section {
@@ -62,10 +101,72 @@ extension DO {
             }
 
             return Section(
-                title: DO.Text.Hierarchy.constraintSection(constraints.count),
+                title: DO.Text.Hierarchy.sectionConstraints,
                 footer: constraints.isEmpty ? DO.Text.Hierarchy.constraintEmpty : nil,
                 rows: rows
             )
+        }
+
+        // MARK: - Builtin rows (code-backed, direct property access)
+
+        private func row(for item: DO.HierarchyBuiltinRow) -> Row {
+            guard let write = item.write else {
+                return Row(cellClass: DO.KeyValueCell.self) { cell in
+                    cell.update(title: item.title, detail: item.detail, rightImage: item.badge)
+                }
+            }
+
+            if case .bool(let isOn) = item.kind {
+                return Row(
+                    cellClass: DO.ToggleCell.self,
+                    onTrigger: { [weak self] cell in
+                        write(.bool(cell.isOn))
+                        self?.loadData()
+                    }
+                ) { cell in
+                    cell.update(title: item.title, detail: item.detail, isOn: isOn)
+                }
+            }
+
+            return Row(
+                cellClass: DO.SelectorCell.self,
+                onTrigger: { [weak self] _ in
+                    guard let self = self else { return }
+                    let input = item.input?() ?? self.makeInput(for: item.kind)
+                    self.presentEditor(title: item.title,
+                                       kind: item.kind,
+                                       input: input,
+                                       onCommit: write)
+                }
+            ) { cell in
+                cell.update(title: item.title, detail: item.detail)
+            }
+        }
+
+        private func presentEditor(
+            title: String,
+            kind: DO.ValueKind,
+            input: DO.HierarchyValueInput?,
+            onCommit: @escaping (DO.ValueKind) -> Void
+        ) {
+            guard let input = input else { return }
+
+            let card = DO.HierarchyEditorCard(key: title, kind: kind, input: input) { [weak self] value in
+                onCommit(value)
+                self?.loadData()
+            }
+            present(card, animated: true)
+        }
+
+        private func makeInput(for kind: DO.ValueKind) -> DO.HierarchyValueInput? {
+            if case let .enumValue(raw, table, _) = kind,
+               let options = DO.HierarchyBuiltinSections.enumTables[table] {
+                return DO.HierarchyEnumListView(table: table,
+                                                names: options.map(\.name),
+                                                rawValues: options.map(\.value),
+                                                currentRawValue: raw)
+            }
+            return DO.HierarchyValueInputFactory.make(for: kind)
         }
 
         private func presentConstraintEditor(_ constraint: NSLayoutConstraint, view: UIView) {

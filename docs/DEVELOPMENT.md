@@ -117,23 +117,27 @@ level 一般用 `.alert - 1`，主菜单用 `.statusBar`。
 一律英文，一到两行。只写「为什么」——为什么这里要这样绕、为什么默认值是这个、踩过什么坑。
 「做了什么」由代码本身表达，不重复。开发期日志与断言里的文案也是英文。
 
-### 7. Hierarchy：JSON 数据驱动
+### 7. Hierarchy：代码 + JSON 两层
 
-把「每个控件暴露哪些属性 + 枚举描述」从几千行硬编码（`NSObject+DoraemonHierarchy.m` 2527 行、
-`DoraemonEnumDescription.m` 880 行）搬进 `Resources/DoSwiftHierarchyDefine.json`：
+固定属性（`UIView` / `CALayer` / `NSObject`）由 `HierarchyBuiltinSections` 用代码写死，
+拿到对象后直接点属性读写，不经过 KVC；枚举表也在代码里。行模型是 `HierarchyBuiltinRow`。
 
-- `Pinned`：先于类分组渲染的普通分组，标题与顺序按数组；分组可带 `overrides`（如 `enumType`），优先于类条目；同一 key 只渲染一次
-- `types`：`{ 类名: { properties: [KVC keyPath], overrides: { key: { enumType, userEditable } } } }`
+`Resources/DoSwiftHierarchyDefine.json` 只描述 `UIView` 子类的额外属性：
+
+- `types`：`{ 类名: { properties: [KVC keyPath], overrides: { key: { enumType, userEditable, desc } } } }`
 - `enums`：`{ 枚举名: { rawValue: 名称 } }`
 
-`HierarchyConstraintEngine` 单独处理运行时集合：沿当前视图与祖先收集参与的约束，
-格式化方程，编辑 `constant` / `priority`；约束不进入 JSON。
+`HierarchyPropertyEngine` 只处理 JSON 子类条目：按类继承链匹配、KVC 读值；
+`userEditable: false` 只用于「kind 可编辑、但属性只读或无 setter」的 key（image / attributedText /
+unknown 天然不可编辑，无需声明）；写回要求 `userEditable` + 可解析的 `ValueKind` + 真实 setter
+三者齐备，否则该行保持只读。
 
-`HierarchyPropertyEngine` 先渲染 JSON 分组，再按类继承链匹配条目、KVC 读值；`userEditable: false` 只用于
-「kind 可编辑、但属性只读或无 setter」的 key（image / attributedText / unknown 天然不可编辑，无需声明）；
-写回要求 `userEditable` + 可解析的
-`ValueKind` + 真实 setter 三者齐备，否则该行保持只读。资源查找顺序：
-`Bundle.main` → `DO.resourceBundle`（SPM 是 `Bundle.module`，CocoaPods 是 `DoSwiftKitResources.bundle`）。
+`HierarchyConstraintEngine` 单独处理运行时集合：沿当前视图与祖先收集参与的约束，格式化方程，
+编辑 `constant` / `priority`；约束不进入 JSON。
+
+详情页按 `Properties` / `Geometry` / `Auto Layout` 三个 segment 展示，切换时重建当前 segment 的数据。
+资源查找顺序：`Bundle.main` → `DO.resourceBundle`（SPM 是 `Bundle.module`，CocoaPods 是
+`DoSwiftKitResources.bundle`）。
 
 取舍（已知、可接受）：丢编译期类型检查（枚举 rawValue 是裸 int）；纯 Swift 非 `@objc`
 属性读不到，只显示到父类层。

@@ -190,6 +190,14 @@
 /* Hierarchy */
 "hierarchy.title" = "Hierarchy";
 "hierarchy.detail_title" = "UI Structure";
+"hierarchy.segment.properties" = "Properties";
+"hierarchy.segment.geometry" = "Geometry";
+"hierarchy.segment.autolayout" = "Auto Layout";
+"hierarchy.section.common" = "Common";
+"hierarchy.section.constraints" = "Constraints";
+"hierarchy.section.diagnostics" = "Diagnostics";
+"hierarchy.section.effective" = "Effective Values";
+"hierarchy.section.traits" = "Traits & RTL";
 "hierarchy.info_title" = "UI Hierarchy";
 "hierarchy.visibility.never" = "Never";
 "hierarchy.visibility.while_dragging" = "While Dragging";
@@ -234,7 +242,6 @@
 "hierarchy.constraints.priority" = "Priority";
 "hierarchy.constraints.empty" = "No constraints involve this view.";
 "hierarchy.constraints.inactive" = "inactive";
-"hierarchy.constraints.section" = "Constraints (%d)";
 
 /* UserDefaults */
 "userdefaults.title" = "UserDefaults";

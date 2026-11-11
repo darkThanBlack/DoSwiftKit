@@ -77,23 +77,30 @@ xcconfig 一起抹掉，表现是 `Unable to find module dependency: 'DoSwift'`�
   cell 一律自绘——iOS 13 上 `textLabel` / `detailTextLabel` 已弃用，用系统 cell 等于踩弃用公告。
 - **注释**：一律英文，一到两行；只写「为什么」，不复述代码。
 
-## Hierarchy：JSON 数据驱动
+## Hierarchy：代码 + JSON 两层
 
 原版 DoKit 把「每个控件暴露哪些属性 + 枚举描述」写成几千行硬编码
-（`NSObject+DoraemonHierarchy.m` 2527 行、`DoraemonEnumDescription.m` 880 行），本工程改为数据驱动：
+（`NSObject+DoraemonHierarchy.m` 2527 行、`DoraemonEnumDescription.m` 880 行）。
+本工程拆成两层，固定部分归代码，子类扩展归数据：
 
-- **`Resources/DoSwiftHierarchyDefine.json`** —— 唯一数据源
-  - `Pinned`：先于类分组渲染的普通分组，`[{ group, properties, overrides? }]`，标题与顺序按数组；
-    `overrides` 可带 `enumType` 等展示信息，优先于类条目；同一 key 只渲染一次
-  - `types`：`{ 类名: { properties: [KVC keyPath], overrides: { key: { enumType, userEditable } } } }`
+- **代码写死的基础层**（`HierarchyBuiltinSections`）：`UIView` / `CALayer` / `NSObject` 的固定属性，
+  拿到 `UIView` 后直接点属性读写，不经过 KVC；枚举表也在代码里。行模型是 `HierarchyBuiltinRow`。
+- **`Resources/DoSwiftHierarchyDefine.json`** —— 只描述 `UIView` 子类的额外属性：
+  - `types`：`{ 类名: { properties: [KVC keyPath], overrides: { key: { enumType, userEditable, desc } } } }`
   - `enums`：`{ 枚举名: { rawValue: 名称 } }`
-- **`HierarchyPropertyEngine`**：按类继承链（`NSObject` → 子类）匹配条目，KVC 读值，生成
-  `HierarchyConstraintEngine` 处理运行时约束（不进入 JSON）：收集、格式化、改 constant/priority。
-  `HierarchyCategoryModel` / `HierarchyCellModel`；`userEditable: false` 只用于「kind 可编辑、但属性只读或无 setter」的 key，
-  image / attributedText / unknown 这类天然不可编辑的行不需要声明。写回需同时满足 `userEditable`、可解析的
-  `ValueKind`、真实 setter，缺一即只读。编辑 UI 在 `UserInterface/Editor/`。
+- **`HierarchyPropertyEngine`**：只处理 JSON 子类条目，按类继承链匹配、KVC 读值，输出
+  `HierarchyCategoryModel` / `HierarchyCellModel`；`userEditable: false` 只用于「kind 可编辑、
+  但属性只读或无 setter」的 key（image / attributedText / unknown 天然不可编辑，无需声明）。
+  写回需同时满足 `userEditable`、可解析的 `ValueKind`、真实 setter，缺一即只读。
+- **`HierarchyConstraintEngine`**：运行时约束（不进入 JSON），收集、格式化方程、修改 constant / priority。
+- **详情页**：`Properties` / `Geometry` / `Auto Layout` 三个 segment，切换时重建当前 segment 的数据。
 - **资源查找**：先看 `Bundle.main`，找不到再走 `DO.resourceBundle`
   （SPM → `Bundle.module`，CocoaPods → `DoSwiftKitResources.bundle`）。
+
+### Hierarchy 后续需求（已确认，未实现）
+
+- 数值输入控件支持快捷预设：一个输入框可带多个预设按钮，点击直接填入对应输入框；priority 是首个用例。
+- 约束诊断拆二级页面：Diagnostics 只保留摘要，完整的歧义视图与约束明细放到二级页展示。
 
 数据驱动的取舍（已知、可接受）：
 - 丢编译期类型检查——枚举 rawValue 是裸 int，靠 JSON 里的名字自解释

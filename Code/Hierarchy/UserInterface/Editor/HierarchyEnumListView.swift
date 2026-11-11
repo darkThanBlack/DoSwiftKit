@@ -26,14 +26,22 @@ extension DO {
         private var selectedIndex: Int?
         private var checkmarks: [UILabel] = []
 
-        init?(table: String, currentRawValue: Int) {
-            self.table = table
+        convenience init?(table: String, currentRawValue: Int) {
             let options = DO.HierarchyPropertyEngine.shared
                 .enumOptions(for: table, currentRawValue: currentRawValue)
-            guard !options.names.isEmpty else { return nil }
-            self.names = options.names
-            self.rawValues = options.rawValues
-            self.selectedIndex = options.currentIndex
+            self.init(table: table,
+                      names: options.names,
+                      rawValues: options.rawValues,
+                      currentRawValue: currentRawValue)
+        }
+
+        /// Options supplied by the caller, for rows whose enum table lives in code.
+        init?(table: String, names: [String], rawValues: [Int], currentRawValue: Int) {
+            guard !names.isEmpty, names.count == rawValues.count else { return nil }
+            self.table = table
+            self.names = names
+            self.rawValues = rawValues
+            self.selectedIndex = rawValues.firstIndex(of: currentRawValue)
             super.init(frame: .zero)
             setupSubviews()
         }

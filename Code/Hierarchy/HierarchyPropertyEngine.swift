@@ -25,14 +25,6 @@ extension DO {
         let overrides: [String: DO.HierarchyPropertyOverride]?
     }
 
-    /// One JSON group: a section title plus the keys it lists, in display order. Groups may
-    /// carry their own display metadata (enum tables, descriptions) without a type entry.
-    struct HierarchyGroup: Decodable {
-        let group: String
-        let properties: [String]
-        let overrides: [String: DO.HierarchyPropertyOverride]?
-    }
-
     struct HierarchyEnumValue {
         let value: Int
         let name: String
@@ -111,15 +103,8 @@ extension DO {
     }
 
     struct DoSwiftHierarchyDefineRoot: Decodable {
-        let groups: [DO.HierarchyGroup]?
         let types: [String: DO.HierarchyTypeEntry]
         let enums: [String: [String: String]]
-
-        private enum CodingKeys: String, CodingKey {
-            case groups = "Pinned"
-            case types
-            case enums
-        }
     }
 
     struct HierarchyEditDescriptor {
@@ -142,9 +127,6 @@ extension DO {
         private var types: [String: DO.HierarchyTypeEntry] = [:]
         private var enumTables: [String: [DO.HierarchyEnumValue]] = [:]
 
-        /// Groups are rendered first, in JSON order; every key appears at most once.
-        private var groups: [DO.HierarchyGroup] = []
-
         private init() {
             loadJSON()
         }
@@ -164,7 +146,6 @@ extension DO {
                     }
                     .sorted { $0.value < $1.value }
                 }
-                groups = root.groups ?? []
             } catch {
                 print("[Hierarchy] Failed to load DoSwiftHierarchyDefine.json: \(error)")
             }
@@ -180,44 +161,21 @@ extension DO {
             return DO.resourceBundle.url(forResource: "DoSwiftHierarchyDefine", withExtension: "json")
         }
 
-        /// JSON groups first (their own titles and order), then the class chain from NSObject
-        /// down. A key rendered by a group is not repeated in a class section.
+        /// Subclass entries only: the class chain from NSObject down, one section per entry.
         func categoryModels(for view: UIView) -> [DO.HierarchyCategoryModel] {
             let chain = classChain(view)
-            var result: [DO.HierarchyCategoryModel] = []
-            var rendered: Set<String> = []
-
-            for group in groups {
-                let rows = group.properties.compactMap { key -> DO.HierarchyCellModel? in
-                    guard !rendered.contains(key) else { return nil }
-                    guard let model = cellModel(for: view, key: key, chain: chain,
-                                                requiresDeclaration: false,
-                                                groupOverrides: group.overrides)
-                    else { return nil }
-                    rendered.insert(key)
-                    return model
+            return chain.compactMap { className in
+                guard let entry = types[className] else { return nil }
+                let rows = entry.properties.compactMap {
+                    cellModel(for: view, key: $0, chain: chain, requiresDeclaration: true)
                 }
-                if !rows.isEmpty {
-                    result.append(DO.HierarchyCategoryModel(title: group.group, items: rows))
-                }
+                return rows.isEmpty ? nil : DO.HierarchyCategoryModel(title: className, items: rows)
             }
-
-            for className in chain {
-                guard let entry = types[className] else { continue }
-                let rows = entry.properties
-                    .filter { !rendered.contains($0) }
-                    .compactMap { cellModel(for: view, key: $0, chain: chain, requiresDeclaration: true) }
-                if !rows.isEmpty {
-                    result.append(DO.HierarchyCategoryModel(title: className, items: rows))
-                }
-            }
-
-            return result
         }
 
         func cellModel(for view: UIView, key: String) -> DO.HierarchyCellModel? {
             return cellModel(for: view, key: key, chain: classChain(view),
-                             requiresDeclaration: false, groupOverrides: nil)
+                             requiresDeclaration: false)
         }
 
         private struct ResolvedProperty {
@@ -231,12 +189,10 @@ extension DO {
             for view: UIView,
             key: String,
             chain: [String],
-            requiresDeclaration: Bool,
-            groupOverrides: [String: DO.HierarchyPropertyOverride]? = nil
+            requiresDeclaration: Bool
         ) -> DO.HierarchyCellModel? {
             guard let resolved = resolve(key: key, view: view, chain: chain,
-                                         requiresDeclaration: requiresDeclaration,
-                                         groupOverrides: groupOverrides),
+                                         requiresDeclaration: requiresDeclaration),
                   let model = makeCellModel(for: view, resolved: resolved)
             else { return nil }
 
@@ -251,14 +207,13 @@ extension DO {
             key: String,
             view: UIView,
             chain: [String],
-            requiresDeclaration: Bool,
-            groupOverrides: [String: DO.HierarchyPropertyOverride]? = nil
+            requiresDeclaration: Bool
         ) -> ResolvedProperty? {
-            // Group metadata wins; otherwise the nearest declaring class supplies the overrides.
+            // The nearest declaring class supplies the overrides.
             let declaring = chain.first { types[$0]?.properties.contains(key) == true }
             if requiresDeclaration, declaring == nil { return nil }
 
-            let override = groupOverrides?[key] ?? declaring.flatMap { types[$0]?.overrides?[key] }
+            let override = declaring.flatMap { types[$0]?.overrides?[key] }
             let isUserEditable = override?.userEditable ?? true
 
             guard let value = safeValue(forKeyPath: key, on: view) else { return nil }
@@ -382,7 +337,7 @@ extension DO {
         /// the live value disagree — log it, never crash the host app over a debug panel.
         func write(_ newValue: DO.ValueKind, forKey key: String, to view: UIView) {
             guard let resolved = resolve(key: key, view: view, chain: classChain(view),
-                                        requiresDeclaration: false, groupOverrides: nil),
+                                        requiresDeclaration: false),
                   resolved.isUserEditable, let oldKind = resolved.kind else {
                 print("[Hierarchy] \(key): this row is read-only")
                 return

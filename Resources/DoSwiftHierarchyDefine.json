@@ -1,102 +1,5 @@
 {
-  "Pinned": [
-    {
-      "group": "Frame",
-      "properties": [
-        "frame",
-        "bounds",
-        "center"
-      ]
-    },
-    {
-      "group": "Layer",
-      "properties": [
-        "layer.position",
-        "layer.zPosition",
-        "layer.anchorPoint",
-        "layer.anchorPointZ",
-        "layer.description",
-        "layer.class"
-      ]
-    },
-    {
-      "group": "Stack",
-      "properties": [
-        "axis",
-        "distribution",
-        "alignment",
-        "spacing",
-        "baselineRelativeArrangement",
-        "isLayoutMarginsRelativeArrangement"
-      ],
-      "overrides": {
-        "axis": {
-          "enumType": "UILayoutConstraintAxis"
-        },
-        "distribution": {
-          "enumType": "UIStackViewDistribution"
-        },
-        "alignment": {
-          "enumType": "UIStackViewAlignment"
-        }
-      }
-    }
-  ],
   "types": {
-    "NSObject": {
-      "properties": [
-        "class",
-        "description"
-      ],
-      "overrides": {
-        "description": {
-          "userEditable": false
-        }
-      }
-    },
-    "UIView": {
-      "properties": [
-        "contentMode",
-        "tag",
-        "isUserInteractionEnabled",
-        "isMultipleTouchEnabled",
-        "alpha",
-        "backgroundColor",
-        "tintColor",
-        "isOpaque",
-        "isHidden",
-        "clearsContextBeforeDrawing",
-        "clipsToBounds",
-        "autoresizesSubviews",
-        "traitCollection",
-        "traitCollection.userInterfaceStyle",
-        "traitCollection.verticalSizeClass",
-        "traitCollection.horizontalSizeClass",
-        "traitCollection.layoutDirection",
-        "translatesAutoresizingMaskIntoConstraints"
-      ],
-      "overrides": {
-        "contentMode": {
-          "enumType": "UIViewContentMode"
-        },
-        "traitCollection.userInterfaceStyle": {
-          "enumType": "UIUserInterfaceStyle",
-          "userEditable": false
-        },
-        "traitCollection.verticalSizeClass": {
-          "enumType": "UIUserInterfaceSizeClass",
-          "userEditable": false
-        },
-        "traitCollection.horizontalSizeClass": {
-          "enumType": "UIUserInterfaceSizeClass",
-          "userEditable": false
-        },
-        "traitCollection.layoutDirection": {
-          "enumType": "UITraitEnvironmentLayoutDirection",
-          "userEditable": false
-        }
-      }
-    },
     "UILabel": {
       "properties": [
         "text",
@@ -583,24 +486,30 @@
           "userEditable": false
         }
       }
+    },
+    "UIStackView": {
+      "properties": [
+        "axis",
+        "distribution",
+        "alignment",
+        "spacing",
+        "baselineRelativeArrangement",
+        "isLayoutMarginsRelativeArrangement"
+      ],
+      "overrides": {
+        "axis": {
+          "enumType": "UILayoutConstraintAxis"
+        },
+        "distribution": {
+          "enumType": "UIStackViewDistribution"
+        },
+        "alignment": {
+          "enumType": "UIStackViewAlignment"
+        }
+      }
     }
   },
   "enums": {
-    "UIViewContentMode": {
-      "0": "scaleToFill",
-      "1": "scaleAspectFit",
-      "2": "scaleAspectFill",
-      "3": "redraw",
-      "4": "center",
-      "5": "top",
-      "6": "bottom",
-      "7": "left",
-      "8": "right",
-      "9": "topLeft",
-      "10": "topRight",
-      "11": "bottomLeft",
-      "12": "bottomRight"
-    },
     "NSTextAlignment": {
       "0": "left",
       "1": "center",
@@ -776,21 +685,6 @@
       "0": "automatic",
       "1": "fill",
       "2": "centered"
-    },
-    "UIUserInterfaceStyle": {
-      "0": "unspecified",
-      "1": "light",
-      "2": "dark"
-    },
-    "UIUserInterfaceSizeClass": {
-      "0": "unspecified",
-      "1": "compact",
-      "2": "regular"
-    },
-    "UITraitEnvironmentLayoutDirection": {
-      "-1": "unspecified",
-      "0": "leftToRight",
-      "1": "rightToLeft"
     },
     "UILayoutConstraintAxis": {
       "0": "horizontal",
