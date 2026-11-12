@@ -125,9 +125,9 @@ extension DO {
             let owner = ownerViewController(of: view).map { String(describing: type(of: $0)) } ?? "nil"
 
             return DO.HierarchyBuiltinSection(title: "Object", rows: [
+                row("viewController.class", .text(owner)),
                 row("class", .text(String(describing: type(of: view)))),
                 row("description", .text(view.description)),
-                row("viewController.class", .text(owner)),
             ])
         }
 
@@ -432,12 +432,12 @@ extension DO {
 
         private static func traits(_ view: UIView) -> DO.HierarchyBuiltinSection {
             return DO.HierarchyBuiltinSection(title: DO.Text.Hierarchy.sectionTraits, rows: [
-                row("traitCollection", .text(String(describing: view.traitCollection))),
                 row("semanticContentAttribute",
                     enumKind("UISemanticContentAttribute", raw: Int(view.semanticContentAttribute.rawValue))),
                 row("directionalLayoutMargins", .text(directionalInsetsText(view.directionalLayoutMargins))),
                 row("effectiveUserInterfaceLayoutDirection",
                     enumKind("UIUserInterfaceLayoutDirection", raw: Int(view.effectiveUserInterfaceLayoutDirection.rawValue))),
+                row("traitCollection", .text(String(describing: view.traitCollection))),
             ])
         }
 
