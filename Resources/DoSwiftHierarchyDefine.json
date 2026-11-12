@@ -1,5 +1,5 @@
 {
-  "types": {
+  "views": {
     "UILabel": {
       "properties": [
         "text",
@@ -505,6 +505,49 @@
         },
         "alignment": {
           "enumType": "UIStackViewAlignment"
+        }
+      }
+    }
+  },
+  "layers": {
+    "CAShapeLayer": {
+      "properties": [
+        "path",
+        "fillColor",
+        "strokeColor",
+        "lineWidth",
+        "lineCap",
+        "lineJoin",
+        "miterLimit",
+        "strokeStart",
+        "strokeEnd",
+        "lineDashPhase",
+        "lineDashPattern",
+        "fillRule"
+      ],
+      "overrides": {
+        "lineCap": {
+          "userEditable": false
+        },
+        "lineJoin": {
+          "userEditable": false
+        },
+        "fillRule": {
+          "userEditable": false
+        }
+      }
+    },
+    "CAGradientLayer": {
+      "properties": [
+        "colors",
+        "locations",
+        "startPoint",
+        "endPoint",
+        "type"
+      ],
+      "overrides": {
+        "type": {
+          "userEditable": false
         }
       }
     }

@@ -20,7 +20,7 @@ extension DO {
         let userEditable: Bool?
     }
 
-    struct HierarchyTypeEntry: Decodable {
+    struct HierarchyClassEntry: Decodable {
         let properties: [String]
         let overrides: [String: DO.HierarchyPropertyOverride]?
     }
@@ -53,6 +53,10 @@ extension DO {
         static func probe(_ value: Any) -> DO.ValueKind {
             switch value {
             case let color as UIColor: return .color(color)
+            // CF types bridge to each other without a runtime check, so `as? CGColor`
+            // would also "succeed" for unrelated objects; compare the type ID instead.
+            case let object as AnyObject where isCGColorValue(object):
+                return .color(UIColor(cgColor: object as! CGColor))
 
             case let number as NSNumber:
                 switch String(cString: number.objCType) {
@@ -103,7 +107,9 @@ extension DO {
     }
 
     struct DoSwiftHierarchyDefineRoot: Decodable {
-        let types: [String: DO.HierarchyTypeEntry]
+        /// One tree per inspected subject kind; both share the same entry schema.
+        let views: [String: DO.HierarchyClassEntry]
+        let layers: [String: DO.HierarchyClassEntry]
         let enums: [String: [String: String]]
     }
 
@@ -115,16 +121,19 @@ extension DO {
 
     /// Property panel driven by `DoSwiftHierarchyDefine.json`.
     ///
-    /// The JSON says which class exposes which keys; this class reads them with KVC and renders
-    /// one row each. Lookup walks the class chain from `NSObject` down, so a subclass entry wins
-    /// and the nearest declaring class supplies the overrides. A key only shows when the object
+    /// The JSON has one entry tree per subject kind: `views` for `UIView` subclasses and
+    /// `layers` for `CALayer` subclasses. Whichever tree applies says which class exposes which
+    /// keys; this class reads them with KVC and renders one row each. Lookup walks the class
+    /// chain from `NSObject` down, so a subclass entry wins and the nearest declaring class
+    /// supplies the overrides. A key only shows when the object
     /// answers its getter. Writing needs `userEditable`, a parseable `ValueKind` and a real
     /// setter — miss one and the row stays read-only.
     class HierarchyPropertyEngine {
 
         static let shared = DO.HierarchyPropertyEngine()
 
-        private var types: [String: DO.HierarchyTypeEntry] = [:]
+        private var views: [String: DO.HierarchyClassEntry] = [:]
+        private var layers: [String: DO.HierarchyClassEntry] = [:]
         private var enumTables: [String: [DO.HierarchyEnumValue]] = [:]
 
         private init() {
@@ -139,7 +148,8 @@ extension DO {
             do {
                 let data = try Data(contentsOf: url)
                 let root = try JSONDecoder().decode(DO.DoSwiftHierarchyDefineRoot.self, from: data)
-                types = root.types
+                views = root.views
+                layers = root.layers
                 enumTables = root.enums.mapValues { table -> [DO.HierarchyEnumValue] in
                     table.compactMap { key, name in
                         Int(key).map { DO.HierarchyEnumValue(value: $0, name: name) }
@@ -161,20 +171,26 @@ extension DO {
             return DO.resourceBundle.url(forResource: "DoSwiftHierarchyDefine", withExtension: "json")
         }
 
+        /// `layers` for CALayer subclasses, `views` for everything else.
+        private func tree(for object: NSObject) -> [String: DO.HierarchyClassEntry] {
+            return object is CALayer ? layers : views
+        }
+
         /// Subclass entries only: the class chain from NSObject down, one section per entry.
-        func categoryModels(for view: UIView) -> [DO.HierarchyCategoryModel] {
-            let chain = classChain(view)
+        func categoryModels(for object: NSObject) -> [DO.HierarchyCategoryModel] {
+            let chain = classChain(object)
+            let entries = tree(for: object)
             return chain.compactMap { className in
-                guard let entry = types[className] else { return nil }
+                guard let entry = entries[className] else { return nil }
                 let rows = entry.properties.compactMap {
-                    cellModel(for: view, key: $0, chain: chain, requiresDeclaration: true)
+                    cellModel(for: object, key: $0, chain: chain, requiresDeclaration: true)
                 }
                 return rows.isEmpty ? nil : DO.HierarchyCategoryModel(title: className, items: rows)
             }
         }
 
-        func cellModel(for view: UIView, key: String) -> DO.HierarchyCellModel? {
-            return cellModel(for: view, key: key, chain: classChain(view),
+        func cellModel(for object: NSObject, key: String) -> DO.HierarchyCellModel? {
+            return cellModel(for: object, key: key, chain: classChain(object),
                              requiresDeclaration: false)
         }
 
@@ -186,18 +202,18 @@ extension DO {
         }
 
         private func cellModel(
-            for view: UIView,
+            for object: NSObject,
             key: String,
             chain: [String],
             requiresDeclaration: Bool
         ) -> DO.HierarchyCellModel? {
-            guard let resolved = resolve(key: key, view: view, chain: chain,
+            guard let resolved = resolve(key: key, object: object, chain: chain,
                                          requiresDeclaration: requiresDeclaration),
-                  let model = makeCellModel(for: view, resolved: resolved)
+                  let model = makeCellModel(for: object, resolved: resolved)
             else { return nil }
 
             if resolved.isUserEditable, let kind = resolved.kind, canEdit(kind),
-               !key.contains("."), let writeKey = kvcWriteKey(for: key, on: view) {
+               !key.contains("."), let writeKey = kvcWriteKey(for: key, on: object) {
                 model.edit = DO.HierarchyEditDescriptor(key: key, kind: kind, writeKey: writeKey)
             }
             return model
@@ -205,18 +221,19 @@ extension DO {
 
         private func resolve(
             key: String,
-            view: UIView,
+            object: NSObject,
             chain: [String],
             requiresDeclaration: Bool
         ) -> ResolvedProperty? {
+            let entries = tree(for: object)
             // The nearest declaring class supplies the overrides.
-            let declaring = chain.first { types[$0]?.properties.contains(key) == true }
+            let declaring = chain.first { entries[$0]?.properties.contains(key) == true }
             if requiresDeclaration, declaring == nil { return nil }
 
-            let override = declaring.flatMap { types[$0]?.overrides?[key] }
+            let override = declaring.flatMap { entries[$0]?.overrides?[key] }
             let isUserEditable = override?.userEditable ?? true
 
-            guard let value = safeValue(forKeyPath: key, on: view) else { return nil }
+            guard let value = safeValue(forKeyPath: key, on: object) else { return nil }
 
             let kind: DO.ValueKind
             if let table = override?.enumType {
@@ -230,7 +247,7 @@ extension DO {
                                     desc: override?.desc, isUserEditable: isUserEditable)
         }
 
-        private func makeCellModel(for view: UIView, resolved: ResolvedProperty) -> DO.HierarchyCellModel? {
+        private func makeCellModel(for object: NSObject, resolved: ResolvedProperty) -> DO.HierarchyCellModel? {
             guard let kind = resolved.kind else { return nil }
 
             let model = DO.HierarchyCellModel(title: resolved.desc ?? resolved.key,
@@ -335,8 +352,8 @@ extension DO {
 
         /// Applies an edit. Each guard mirrors one in the UI, so a rejection means the JSON and
         /// the live value disagree — log it, never crash the host app over a debug panel.
-        func write(_ newValue: DO.ValueKind, forKey key: String, to view: UIView) {
-            guard let resolved = resolve(key: key, view: view, chain: classChain(view),
+        func write(_ newValue: DO.ValueKind, forKey key: String, to object: NSObject) {
+            guard let resolved = resolve(key: key, object: object, chain: classChain(object),
                                         requiresDeclaration: false),
                   resolved.isUserEditable, let oldKind = resolved.kind else {
                 print("[Hierarchy] \(key): this row is read-only")
@@ -350,12 +367,25 @@ extension DO {
                 print("[Hierarchy] \(key): key paths are not written from this panel")
                 return
             }
-            guard let writeKey = kvcWriteKey(for: key, on: view) else { return }
+            guard let writeKey = kvcWriteKey(for: key, on: object) else { return }
 
-            view.setValue(newValue.boxed, forKey: writeKey)
-            DO.HierarchyLayoutRefresh.refresh(view)
+            object.setValue(boxedForWrite(newValue, key: key, on: object), forKey: writeKey)
 
+            if let view = object as? UIView {
+                DO.HierarchyLayoutRefresh.refresh(view)
+            } else if let layer = object as? CALayer {
+                layer.setNeedsDisplay()
+            }
         }
+
+        /// `CGColor` properties (borderColor, fillColor, …) reject a `UIColor` from KVC.
+        private func boxedForWrite(_ value: DO.ValueKind, key: String, on object: NSObject) -> Any {
+            if case let .color(color) = value, isCGColorValue(safeValue(forKeyPath: key, on: object)) {
+                return color.cgColor
+            }
+            return value.boxed
+        }
+
 
         private static func writeKeyCandidates(for propertyName: String) -> [String] {
             var candidates = [propertyName]
@@ -381,9 +411,9 @@ extension DO {
         }
 
         /// Superclass chain with `NSObject` first, so sections read base class -> subclass.
-        private func classChain(_ view: UIView) -> [String] {
+        private func classChain(_ object: NSObject) -> [String] {
             var chain: [String] = []
-            var cls: AnyClass? = type(of: view)
+            var cls: AnyClass? = type(of: object)
             while let c = cls {
                 let name = String(describing: c)
                 chain.append(name)
@@ -458,4 +488,11 @@ extension DO {
             return "T: \(f(insets.top))   L: \(f(insets.left))   B: \(f(insets.bottom))   R: \(f(insets.right))"
         }
     }
+}
+
+/// CF types bridge to each other without a runtime check, so `as? CGColor` also "succeeds"
+/// for unrelated objects; the type ID is the only reliable test.
+private func isCGColorValue(_ value: Any?) -> Bool {
+    guard let value = value else { return false }
+    return CFGetTypeID(value as CFTypeRef) == CGColor.typeID
 }

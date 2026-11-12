@@ -20,7 +20,7 @@ final class HierarchyBuiltinSectionsTests: XCTestCase {
         let view = UIView()
 
         XCTAssertEqual(DO.HierarchyBuiltinSections.propertySections(for: view).map(\.title),
-                       ["NSObject", "UIView"])
+                       ["Object", "UIView"])
         XCTAssertEqual(DO.HierarchyBuiltinSections.layerSections(for: view).map(\.title),
                        [DO.Text.Hierarchy.sectionDrawing, DO.Text.Hierarchy.sectionTransform,
                         DO.Text.Hierarchy.sectionAnimations, DO.Text.Hierarchy.sectionDiagnostics])
@@ -90,6 +90,45 @@ final class HierarchyBuiltinSectionsTests: XCTestCase {
                        ["contentsScale", "contentsGravity", "shouldRasterize", "rasterizationScale"])
         XCTAssertEqual(diagnostics?.rows.first { $0.title == "contentsGravity" }?.detail, "resize")
         XCTAssertTrue(diagnostics?.rows.allSatisfy { $0.write == nil } ?? false)
+        XCTAssertTrue(diagnostics?.rows.allSatisfy { $0.badge == nil } ?? false)
+    }
+
+    func testTraitRowsLiveInTheTraitsSection() {
+        let view = UIView()
+
+        let properties = DO.HierarchyBuiltinSections.propertySections(for: view).flatMap(\.rows)
+        XCTAssertFalse(properties.contains { $0.title.hasPrefix("traitCollection") })
+
+        let traits = DO.HierarchyBuiltinSections.autoLayoutSections(for: view)
+            .first { $0.title == DO.Text.Hierarchy.sectionTraits }
+        XCTAssertNotNil(traits?.rows.first { $0.title == "traitCollection" })
+        XCTAssertFalse(traits?.rows.contains { $0.title.hasPrefix("traitCollection.") } ?? true)
+    }
+
+    func testObjectSectionShowsOwningViewController() {
+        let controller = UIViewController()
+        let view = UIView()
+        controller.view.addSubview(view)
+
+        let objectSection = DO.HierarchyBuiltinSections.propertySections(for: view)
+            .first { $0.title == "Object" }
+        XCTAssertEqual(objectSection?.rows.first { $0.title == "viewController.class" }?.detail,
+                       "UIViewController")
+
+        let orphan = UIView()
+        let orphanSection = DO.HierarchyBuiltinSections.propertySections(for: orphan)
+            .first { $0.title == "Object" }
+        XCTAssertEqual(orphanSection?.rows.first { $0.title == "viewController.class" }?.detail, "nil")
+    }
+
+    func testAppearanceEndsWithResponderAndMask() {
+        let view = UIView()
+        let appearance = DO.HierarchyBuiltinSections.propertySections(for: view)
+            .first { $0.title == "UIView" }
+
+        XCTAssertEqual(appearance?.rows.suffix(2).map(\.title), ["isFirstResponder", "mask"])
+        XCTAssertEqual(appearance?.rows.last?.detail, "nil")
+        XCTAssertNil(appearance?.rows.last?.write)
     }
 
     func testAutoLayoutCommonWrites() {

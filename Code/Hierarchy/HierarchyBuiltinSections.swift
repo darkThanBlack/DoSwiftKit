@@ -122,10 +122,24 @@ extension DO {
         // MARK: - Properties
 
         private static func identity(_ view: UIView) -> DO.HierarchyBuiltinSection {
-            return DO.HierarchyBuiltinSection(title: "NSObject", rows: [
+            let owner = ownerViewController(of: view).map { String(describing: type(of: $0)) } ?? "nil"
+
+            return DO.HierarchyBuiltinSection(title: "Object", rows: [
                 row("class", .text(String(describing: type(of: view)))),
                 row("description", .text(view.description)),
+                row("viewController.class", .text(owner)),
             ])
+        }
+
+        /// The nearest controller in the responder chain: a view's `nextResponder` is its
+        /// superview, and the controller is the `nextResponder` of its own root view.
+        private static func ownerViewController(of view: UIView) -> UIViewController? {
+            var responder: UIResponder? = view
+            while let current = responder {
+                if let controller = current as? UIViewController { return controller }
+                responder = current.next
+            }
+            return nil
         }
 
         private static func appearance(_ view: UIView) -> DO.HierarchyBuiltinSection {
@@ -169,11 +183,9 @@ extension DO {
             rows += [
                 bool("isOpaque", view, \.isOpaque),
                 bool("isHidden", view, \.isHidden),
-                bool("clearsContextBeforeDrawing", view, \.clearsContextBeforeDrawing),
                 bool("clipsToBounds", view, \.clipsToBounds),
-                row("traitCollection", .text(view.traitCollection.description)),
-                row("traitCollection.userInterfaceStyle",
-                    enumKind("UIUserInterfaceStyle", raw: Int(view.traitCollection.userInterfaceStyle.rawValue))),
+                row("isFirstResponder", .bool(view.isFirstResponder)),
+                row("mask", .text(view.mask.map { String(describing: type(of: $0)) } ?? "nil")),
             ]
 
             return DO.HierarchyBuiltinSection(title: "UIView", rows: rows)
@@ -299,20 +311,17 @@ extension DO {
             ])
         }
 
-        /// Rarely touched rendering knobs. Shown last, and badged when they explain a blurry result.
+        /// Rarely touched rendering knobs, values only. A scale that differs from the screen is
+        /// not proof of a bug (custom contents, multi-scene, intentional rasterization), so these
+        /// rows carry no badge.
         private static func layerDiagnostics(_ view: UIView) -> DO.HierarchyBuiltinSection {
             let layer = view.layer
-            let scale = UIScreen.main.scale
-            let scaleMismatch = abs(layer.contentsScale - scale) > 0.01
-            let rasterMismatch = layer.shouldRasterize && abs(layer.rasterizationScale - scale) > 0.01
 
             return DO.HierarchyBuiltinSection(title: DO.Text.Hierarchy.sectionDiagnostics, rows: [
-                row("contentsScale", .double(Double(layer.contentsScale)),
-                    badge: scaleMismatch ? badgeImage : nil),
+                row("contentsScale", .double(Double(layer.contentsScale))),
                 row("contentsGravity", .text(layer.contentsGravity.rawValue)),
                 row("shouldRasterize", .bool(layer.shouldRasterize)),
-                row("rasterizationScale", .double(Double(layer.rasterizationScale)),
-                    badge: rasterMismatch ? badgeImage : nil),
+                row("rasterizationScale", .double(Double(layer.rasterizationScale))),
             ])
         }
 
@@ -423,17 +432,12 @@ extension DO {
 
         private static func traits(_ view: UIView) -> DO.HierarchyBuiltinSection {
             return DO.HierarchyBuiltinSection(title: DO.Text.Hierarchy.sectionTraits, rows: [
+                row("traitCollection", .text(String(describing: view.traitCollection))),
                 row("semanticContentAttribute",
                     enumKind("UISemanticContentAttribute", raw: Int(view.semanticContentAttribute.rawValue))),
                 row("directionalLayoutMargins", .text(directionalInsetsText(view.directionalLayoutMargins))),
                 row("effectiveUserInterfaceLayoutDirection",
                     enumKind("UIUserInterfaceLayoutDirection", raw: Int(view.effectiveUserInterfaceLayoutDirection.rawValue))),
-                row("traitCollection.layoutDirection",
-                    enumKind("UITraitEnvironmentLayoutDirection", raw: Int(view.traitCollection.layoutDirection.rawValue))),
-                row("traitCollection.horizontalSizeClass",
-                    enumKind("UIUserInterfaceSizeClass", raw: Int(view.traitCollection.horizontalSizeClass.rawValue))),
-                row("traitCollection.verticalSizeClass",
-                    enumKind("UIUserInterfaceSizeClass", raw: Int(view.traitCollection.verticalSizeClass.rawValue))),
             ])
         }
 

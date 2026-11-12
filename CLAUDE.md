@@ -85,13 +85,16 @@ xcconfig 一起抹掉，表现是 `Unable to find module dependency: 'DoSwift'`�
 
 - **代码写死的基础层**（`HierarchyBuiltinSections`）：`UIView` / `CALayer` / `NSObject` 的固定属性，
   拿到 `UIView` 后直接点属性读写，不经过 KVC；枚举表也在代码里。行模型是 `HierarchyBuiltinRow`。
-- **`Resources/DoSwiftHierarchyDefine.json`** —— 只描述 `UIView` 子类的额外属性：
-  - `types`：`{ 类名: { properties: [KVC keyPath], overrides: { key: { enumType, userEditable, desc } } } }`
-  - `enums`：`{ 枚举名: { rawValue: 名称 } }`
-- **`HierarchyPropertyEngine`**：只处理 JSON 子类条目，按类继承链匹配、KVC 读值，输出
-  `HierarchyCategoryModel` / `HierarchyCellModel`；`userEditable: false` 只用于「kind 可编辑、
-  但属性只读或无 setter」的 key（image / attributedText / unknown 天然不可编辑，无需声明）。
-  写回需同时满足 `userEditable`、可解析的 `ValueKind`、真实 setter，缺一即只读。
+- **`Resources/DoSwiftHierarchyDefine.json`** —— 只描述子类的额外属性，两棵树结构相同：
+  - `views`：`UIView` 子类；`layers`：`CALayer` 子类
+  - 条目：`{ 类名: { properties: [KVC keyPath], overrides: { key: { enumType, userEditable, desc } } } }`
+  - `enums`：`{ 枚举名: { rawValue: 名称 } }`，只支持 Int raw；`CAShapeLayer.lineCap` 这类
+    String raw 枚举直接显示原始值、标 `userEditable: false`
+- **`HierarchyPropertyEngine`**：按对象选树（`CALayer` → `layers`，其余 → `views`），按类继承链匹配、
+  KVC 读值，输出 `HierarchyCategoryModel` / `HierarchyCellModel`；`userEditable: false` 只用于
+  「kind 可编辑、但属性只读或无 setter」的 key（image / attributedText / unknown 天然不可编辑，
+  无需声明）。写回需同时满足 `userEditable`、可解析的 `ValueKind`、真实 setter，缺一即只读。
+  `CGColor` 属性读成颜色、写回时转回 `CGColor`；`CGPath` 与数组只读显示字符串。
 - **`HierarchyConstraintEngine`**：运行时约束（不进入 JSON），收集、格式化方程、修改 constant / priority。
 - **详情页**：`Properties` / `Layer` / `Auto Layout` 三个 segment，切换时重建当前 segment 的数据。
   `Layer` 段固定四节：Drawing / Transform / Animations / Diagnostics；绘制走 `layer.setNeedsDisplay()`，

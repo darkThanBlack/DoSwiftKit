@@ -122,15 +122,17 @@ level 一般用 `.alert - 1`，主菜单用 `.statusBar`。
 固定属性（`UIView` / `CALayer` / `NSObject`）由 `HierarchyBuiltinSections` 用代码写死，
 拿到对象后直接点属性读写，不经过 KVC；枚举表也在代码里。行模型是 `HierarchyBuiltinRow`。
 
-`Resources/DoSwiftHierarchyDefine.json` 只描述 `UIView` 子类的额外属性：
+`Resources/DoSwiftHierarchyDefine.json` 只描述子类的额外属性，根下有三棵树：
 
-- `types`：`{ 类名: { properties: [KVC keyPath], overrides: { key: { enumType, userEditable, desc } } } }`
-- `enums`：`{ 枚举名: { rawValue: 名称 } }`
+- `views`：`UIView` 子类；`layers`：`CALayer` 子类
+- 条目：`{ 类名: { properties: [KVC keyPath], overrides: { key: { enumType, userEditable, desc } } } }`
+- `enums`：`{ 枚举名: { rawValue: 名称 } }`，只支持 Int raw；String raw 枚举（`lineCap` 等）
+  直接显示原始值并标 `userEditable: false`
 
-`HierarchyPropertyEngine` 只处理 JSON 子类条目：按类继承链匹配、KVC 读值；
+`HierarchyPropertyEngine` 按对象类型选树，再按类继承链匹配、KVC 读值；
 `userEditable: false` 只用于「kind 可编辑、但属性只读或无 setter」的 key（image / attributedText /
 unknown 天然不可编辑，无需声明）；写回要求 `userEditable` + 可解析的 `ValueKind` + 真实 setter
-三者齐备，否则该行保持只读。
+三者齐备，否则该行保持只读。`CGColor` 读成颜色、写回转回 `CGColor`；`CGPath` 与数组只读。
 
 `HierarchyConstraintEngine` 单独处理运行时集合：沿当前视图与祖先收集参与的约束，格式化方程，
 编辑 `constant` / `priority`；约束不进入 JSON。

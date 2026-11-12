@@ -58,13 +58,18 @@ extension DO {
                 var result = DO.HierarchyBuiltinSections.propertySections(for: view)
                     .map { builtinSection($0) }
                 result += DO.HierarchyPropertyEngine.shared.categoryModels(for: view)
-                    .map { jsonSection($0) }
+                    .map { jsonSection($0, target: view) }
                 // Most-derived first: subclass, then UIView, then NSObject.
                 sections = Array(result.reversed())
 
             case .layer:
-                sections = DO.HierarchyBuiltinSections.layerSections(for: view)
+                var result = DO.HierarchyBuiltinSections.layerSections(for: view)
                     .map { builtinSection($0) }
+                // Subclass entries for the backing layer, right after Drawing.
+                let layerModels = DO.HierarchyPropertyEngine.shared.categoryModels(for: view.layer)
+                    .map { jsonSection($0, target: view.layer) }
+                result.insert(contentsOf: layerModels, at: min(1, result.count))
+                sections = result
 
             case .autoLayout:
                 var result = DO.HierarchyBuiltinSections.autoLayoutSections(for: view)
@@ -78,8 +83,8 @@ extension DO {
             return Section(title: section.title, rows: section.rows.map { row(for: $0) })
         }
 
-        private func jsonSection(_ model: DO.HierarchyCategoryModel) -> Section {
-            return Section(title: model.title, rows: model.items.map { row(for: $0) })
+        private func jsonSection(_ model: DO.HierarchyCategoryModel, target: NSObject) -> Section {
+            return Section(title: model.title, rows: model.items.map { row(for: $0, target: target) })
         }
 
         private func constraintSection(for view: UIView) -> Section {
@@ -181,7 +186,7 @@ extension DO {
             present(card, animated: true)
         }
 
-        private func row(for item: DO.HierarchyCellModel) -> Row {
+        private func row(for item: DO.HierarchyCellModel, target: NSObject) -> Row {
             guard let edit = item.edit else {
                 return Row(cellClass: DO.KeyValueCell.self) { cell in
                     cell.update(item)
@@ -193,7 +198,9 @@ extension DO {
             case .bool(let isOn):
                 return Row(
                     cellClass: DO.ToggleCell.self,
-                    onTrigger: { [weak self] cell in self?.writeToggle(edit, isOn: cell.isOn) }
+                    onTrigger: { [weak self, weak target] cell in
+                        self?.writeToggle(edit, isOn: cell.isOn, target: target)
+                    }
                 ) { cell in
                     cell.update(title: item.title, detail: item.detailTitle, isOn: isOn)
                     cell.separatorInset = item.separatorInsets
@@ -202,7 +209,9 @@ extension DO {
             default:
                 return Row(
                     cellClass: DO.SelectorCell.self,
-                    onTrigger: { [weak self] _ in self?.presentEditor(edit) }
+                    onTrigger: { [weak self, weak target] _ in
+                        self?.presentEditor(edit, target: target)
+                    }
                 ) { cell in
                     cell.update(title: item.title, detail: item.detailTitle)
                     cell.separatorInset = item.separatorInsets
@@ -210,19 +219,19 @@ extension DO {
             }
         }
 
-        private func writeToggle(_ edit: DO.HierarchyEditDescriptor, isOn: Bool) {
-            guard let view = selectView else { return }
-            DO.HierarchyPropertyEngine.shared.write(.bool(isOn), forKey: edit.key, to: view)
+        private func writeToggle(_ edit: DO.HierarchyEditDescriptor, isOn: Bool, target: NSObject?) {
+            guard let target = target else { return }
+            DO.HierarchyPropertyEngine.shared.write(.bool(isOn), forKey: edit.key, to: target)
             loadData()
         }
 
-        private func presentEditor(_ edit: DO.HierarchyEditDescriptor) {
-            guard let view = selectView,
+        private func presentEditor(_ edit: DO.HierarchyEditDescriptor, target: NSObject?) {
+            guard let target = target,
                   let input = DO.HierarchyValueInputFactory.make(for: edit.kind) else { return }
 
-            let card = DO.HierarchyEditorCard(key: edit.key, kind: edit.kind, input: input) { [weak self, weak view] value in
-                guard let view = view else { return }
-                DO.HierarchyPropertyEngine.shared.write(value, forKey: edit.key, to: view)
+            let card = DO.HierarchyEditorCard(key: edit.key, kind: edit.kind, input: input) { [weak self, weak target] value in
+                guard let target = target else { return }
+                DO.HierarchyPropertyEngine.shared.write(value, forKey: edit.key, to: target)
                 self?.loadData()
             }
             present(card, animated: true)

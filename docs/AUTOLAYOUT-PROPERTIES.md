@@ -73,15 +73,18 @@ view.layer.animationKeys()  // ["opacity", "position"]
 
 ## 5. Diagnostics
 
-| 行 | 类型 | 徽标条件 |
+| 行 | 类型 | 说明 |
 |---|---|---|
-| `contentsScale` | double | 与屏幕 scale 不一致 |
-| `contentsGravity` | text | 无 |
-| `shouldRasterize` | bool | 无 |
-| `rasterizationScale` | double | `shouldRasterize == true` 且与屏幕 scale 不一致 |
+| `contentsScale` | double | 只读 |
+| `contentsGravity` | text | 只读，显示原始值 |
+| `shouldRasterize` | bool | 只读 |
+| `rasterizationScale` | double | 只读 |
 
 这四项回答的是「为什么糊了 / 为什么变形了」：手写 sublayer 的 `contentsScale` 默认 1.0，
 `shouldRasterize` 开了但 `rasterizationScale` 没跟上，都会让渲染发虚。
+
+**不挂徽标**：scale 与屏幕 scale 不一致并不必然是问题（自定义 contents、多 scene、
+有意的离屏光栅化都会如此），简单比对会制造假阳性，所以这里只给值。
 
 ---
 
@@ -98,8 +101,13 @@ view.layer.animationKeys()  // ["opacity", "position"]
 
 ---
 
-## 7. 待定
+## 7. 子类属性（已实现）
 
-- **Sublayers 列表**：直接子层（类名 + name + bounds）可作为下一节；点击进二级页展示该层属性。
-- **layer 属性进 JSON**：与 `types` 同 schema 增加 `layers` 键，覆盖 `layerClass` 被子类替换的场景；
-  基础 CALayer 属性继续代码写死。
+`view.layer` 被 `layerClass` 换成子类时，Layer 段在 Drawing 之后插入该子类的 JSON 条目：
+
+- `DoSwiftHierarchyDefine.json` 根下 `views` / `layers` 两棵树，schema 相同；
+- 首批条目：`CAShapeLayer`（颜色、线宽、dash、只读 path/fillRule）、`CAGradientLayer`
+  （只读 colors/locations，可写 start/endPoint，只读 type）；
+- String raw 枚举直接显示原始值、不入 `enums`，且标为只读。
+
+不做的部分：sublayers 列表、`CAEmitterLayer` / `CATextLayer`（文本统一走 `UILabel`）。
