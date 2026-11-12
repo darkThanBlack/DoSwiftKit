@@ -21,11 +21,75 @@ final class HierarchyBuiltinSectionsTests: XCTestCase {
 
         XCTAssertEqual(DO.HierarchyBuiltinSections.propertySections(for: view).map(\.title),
                        ["NSObject", "UIView"])
-        XCTAssertEqual(DO.HierarchyBuiltinSections.geometrySections(for: view).map(\.title),
-                       ["Layer"])
+        XCTAssertEqual(DO.HierarchyBuiltinSections.layerSections(for: view).map(\.title),
+                       [DO.Text.Hierarchy.sectionDrawing, DO.Text.Hierarchy.sectionTransform,
+                        DO.Text.Hierarchy.sectionAnimations, DO.Text.Hierarchy.sectionDiagnostics])
         XCTAssertEqual(DO.HierarchyBuiltinSections.autoLayoutSections(for: view).map(\.title),
                        [DO.Text.Hierarchy.sectionCommon, DO.Text.Hierarchy.sectionDiagnostics,
                         DO.Text.Hierarchy.sectionEffective, DO.Text.Hierarchy.sectionTraits])
+    }
+
+    func testLayerDrawingWrites() {
+        let view = UIView()
+        let drawing = DO.HierarchyBuiltinSections.layerSections(for: view)
+            .first { $0.title == DO.Text.Hierarchy.sectionDrawing }
+
+        XCTAssertEqual(drawing?.rows.first?.title, "layer.class")
+        XCTAssertEqual(drawing?.rows.first?.detail, "CALayer")
+
+        drawing?.rows.first { $0.title == "cornerRadius" }?.write?(.double(8))
+        XCTAssertEqual(view.layer.cornerRadius, 8)
+
+        drawing?.rows.first { $0.title == "cornerCurve" }?
+            .write?(.enumValue(raw: 1, table: "CALayerCornerCurve", name: "continuous"))
+        XCTAssertEqual(view.layer.cornerCurve, .continuous)
+
+        drawing?.rows.first { $0.title == "borderWidth" }?.write?(.double(2))
+        XCTAssertEqual(view.layer.borderWidth, 2)
+
+        XCTAssertNil(drawing?.rows.first { $0.title == "shadowPath" }?.write)
+    }
+
+    func testLayerTransformWrites() {
+        let view = UIView()
+        let transform = DO.HierarchyBuiltinSections.layerSections(for: view)
+            .first { $0.title == DO.Text.Hierarchy.sectionTransform }
+
+        let row = transform?.rows.first { $0.title == "transform" }
+        XCTAssertNotNil(row?.input?())
+
+        row?.write?(.text("2,0,0,3,10,20"))
+        XCTAssertEqual(view.transform, CGAffineTransform(a: 2, b: 0, c: 0, d: 3, tx: 10, ty: 20))
+
+        XCTAssertNil(transform?.rows.first { $0.title == "transform3D" }?.write)
+        XCTAssertNil(transform?.rows.first { $0.title == "position" }?.badge)
+    }
+
+    func testLayerAnimationKeysRow() {
+        let view = UIView()
+        let animations = DO.HierarchyBuiltinSections.layerSections(for: view)
+            .first { $0.title == DO.Text.Hierarchy.sectionAnimations }
+
+        XCTAssertEqual(animations?.rows.count, 1)
+        XCTAssertEqual(animations?.rows.first?.detail, "none")
+        XCTAssertNil(animations?.rows.first?.write)
+
+        view.layer.add(CABasicAnimation(keyPath: "opacity"), forKey: "fade")
+
+        let refreshed = DO.HierarchyBuiltinSections.layerSections(for: view)
+            .first { $0.title == DO.Text.Hierarchy.sectionAnimations }
+        XCTAssertEqual(refreshed?.rows.first?.detail, "fade")
+    }
+
+    func testLayerDiagnosticsRows() {
+        let view = UIView()
+        let diagnostics = DO.HierarchyBuiltinSections.layerSections(for: view).last
+
+        XCTAssertEqual(diagnostics?.title, DO.Text.Hierarchy.sectionDiagnostics)
+        XCTAssertEqual(diagnostics?.rows.map(\.title),
+                       ["contentsScale", "contentsGravity", "shouldRasterize", "rasterizationScale"])
+        XCTAssertEqual(diagnostics?.rows.first { $0.title == "contentsGravity" }?.detail, "resize")
+        XCTAssertTrue(diagnostics?.rows.allSatisfy { $0.write == nil } ?? false)
     }
 
     func testAutoLayoutCommonWrites() {

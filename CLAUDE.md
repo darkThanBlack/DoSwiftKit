@@ -93,13 +93,17 @@ xcconfig 一起抹掉，表现是 `Unable to find module dependency: 'DoSwift'`�
   但属性只读或无 setter」的 key（image / attributedText / unknown 天然不可编辑，无需声明）。
   写回需同时满足 `userEditable`、可解析的 `ValueKind`、真实 setter，缺一即只读。
 - **`HierarchyConstraintEngine`**：运行时约束（不进入 JSON），收集、格式化方程、修改 constant / priority。
-- **详情页**：`Properties` / `Geometry` / `Auto Layout` 三个 segment，切换时重建当前 segment 的数据。
+- **详情页**：`Properties` / `Layer` / `Auto Layout` 三个 segment，切换时重建当前 segment 的数据。
+  `Layer` 段固定四节：Drawing / Transform / Animations / Diagnostics；绘制走 `layer.setNeedsDisplay()`，
+  动画只读 `animationKeys()`，诊断节只放 `contentsScale` / `contentsGravity` / `shouldRasterize` / `rasterizationScale`。
+- **数值输入**：`HierarchyNumberFieldView` 可带 `presets: [Double]`，字段下方渲染一行 28pt 扁 chips
+  （横向滚动、不换行），点击只回填输入框，仍由 Done 提交；`HierarchyNumberGridView` 收同一份预设，
+  每个字段各渲染一行。预设只收一份值列表，不做 `labels` / `values` 双数组对齐。
 - **资源查找**：先看 `Bundle.main`，找不到再走 `DO.resourceBundle`
   （SPM → `Bundle.module`，CocoaPods → `DoSwiftKitResources.bundle`）。
 
 ### Hierarchy 后续需求（已确认，未实现）
 
-- 数值输入控件支持快捷预设：一个输入框可带多个预设按钮，点击直接填入对应输入框；priority 是首个用例。
 - 约束诊断拆二级页面：Diagnostics 只保留摘要，完整的歧义视图与约束明细放到二级页展示。
 
 数据驱动的取舍（已知、可接受）：

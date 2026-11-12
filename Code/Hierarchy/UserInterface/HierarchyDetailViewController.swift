@@ -20,7 +20,7 @@ extension DO {
 
         private enum Tab: Int {
             case properties
-            case geometry
+            case layer
             case autoLayout
         }
 
@@ -28,7 +28,7 @@ extension DO {
 
         private lazy var segments: UISegmentedControl = {
             let control = UISegmentedControl(items: [DO.Text.Hierarchy.segmentProperties,
-                                                     DO.Text.Hierarchy.segmentGeometry,
+                                                     DO.Text.Hierarchy.segmentLayer,
                                                      DO.Text.Hierarchy.segmentAutoLayout])
             control.selectedSegmentIndex = Tab.properties.rawValue
             control.addTarget(self, action: #selector(segmentChanged), for: .valueChanged)
@@ -62,8 +62,8 @@ extension DO {
                 // Most-derived first: subclass, then UIView, then NSObject.
                 sections = Array(result.reversed())
 
-            case .geometry:
-                sections = DO.HierarchyBuiltinSections.geometrySections(for: view)
+            case .layer:
+                sections = DO.HierarchyBuiltinSections.layerSections(for: view)
                     .map { builtinSection($0) }
 
             case .autoLayout:

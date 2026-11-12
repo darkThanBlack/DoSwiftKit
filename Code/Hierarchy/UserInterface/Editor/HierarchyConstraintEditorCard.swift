@@ -97,8 +97,11 @@ extension DO {
         }()
 
         private lazy var priorityField: DO.HierarchyNumberFieldView = {
-            return DO.HierarchyNumberFieldView(isInteger: true, step: 50,
-                                               value: Double(constraint.priority.rawValue), prominent: false)
+            return DO.HierarchyNumberFieldView(
+                isInteger: true, step: 50,
+                value: Double(constraint.priority.rawValue), prominent: false,
+                presets: DO.HierarchyEditorStyle.layoutPriorityPresets
+            )
         }()
 
         private func setupCard() {
@@ -170,16 +173,26 @@ extension DO {
             bodyStack.layoutMargins = UIEdgeInsets(top: 16, left: DO.HierarchyEditorStyle.padding,
                                                    bottom: 16, right: DO.HierarchyEditorStyle.padding)
 
+            // The body grows with the preset strips, so it scrolls instead of forcing the card
+            // past the safe area. Dragging also dismisses the keyboard, same as the generic card.
+            let bodyScroll = UIScrollView()
+            bodyScroll.alwaysBounceVertical = false
+            bodyScroll.keyboardDismissMode = .interactive
+
+            let bodyContent = UIView()
+            bodyContent.addSubview(bodyStack)
+            bodyScroll.addSubview(bodyContent)
+
             let bottomBar = UIView()
             bottomBar.addSubview(doneButton)
 
-            let stack = UIStackView(arrangedSubviews: [header, divider(), bodyStack, divider(), bottomBar])
+            let stack = UIStackView(arrangedSubviews: [header, divider(), bodyScroll, divider(), bottomBar])
             stack.axis = .vertical
             stack.spacing = 0
             clipper.addSubview(stack)
 
             [stack, grabber, titleStack, titleLabel, subtitleLabel, header,
-             bodyStack, bottomBar, doneButton].forEach {
+             bodyScroll, bodyContent, bodyStack, bottomBar, doneButton].forEach {
                 $0.translatesAutoresizingMaskIntoConstraints = false
             }
             NSLayoutConstraint.activate([
@@ -204,7 +217,23 @@ extension DO {
                 doneButton.bottomAnchor.constraint(equalTo: bottomBar.bottomAnchor, constant: -10),
                 doneButton.trailingAnchor.constraint(equalTo: bottomBar.trailingAnchor,
                                                      constant: -DO.HierarchyEditorStyle.padding),
+
+                bodyContent.widthAnchor.constraint(equalTo: bodyScroll.frameLayoutGuide.widthAnchor),
+
+                bodyStack.topAnchor.constraint(equalTo: bodyContent.topAnchor),
+                bodyStack.leadingAnchor.constraint(equalTo: bodyContent.leadingAnchor),
+                bodyStack.trailingAnchor.constraint(equalTo: bodyContent.trailingAnchor),
+                bodyStack.bottomAnchor.constraint(equalTo: bodyContent.bottomAnchor),
+
+                bodyContent.topAnchor.constraint(equalTo: bodyScroll.contentLayoutGuide.topAnchor),
+                bodyContent.leadingAnchor.constraint(equalTo: bodyScroll.contentLayoutGuide.leadingAnchor),
+                bodyContent.trailingAnchor.constraint(equalTo: bodyScroll.contentLayoutGuide.trailingAnchor),
+                bodyContent.bottomAnchor.constraint(equalTo: bodyScroll.contentLayoutGuide.bottomAnchor),
             ])
+
+            let hugContent = bodyScroll.heightAnchor.constraint(equalTo: bodyContent.heightAnchor)
+            hugContent.priority = UILayoutPriority(rawValue: UILayoutPriority.defaultHigh.rawValue - 1)
+            hugContent.isActive = true
         }
 
         private func makeRow(_ title: String, _ control: UIView) -> UIStackView {

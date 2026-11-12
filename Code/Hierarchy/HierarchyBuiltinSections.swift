@@ -83,6 +83,10 @@ extension DO {
                 .init(value: 0, name: "leftToRight"),
                 .init(value: 1, name: "rightToLeft"),
             ],
+            "CALayerCornerCurve": [
+                .init(value: 0, name: "circular"),
+                .init(value: 1, name: "continuous"),
+            ],
             "UISemanticContentAttribute": [
                 .init(value: 0, name: "unspecified"),
                 .init(value: 1, name: "playback"),
@@ -105,9 +109,9 @@ extension DO {
             return [identity(view), appearance(view)]
         }
 
-        /// "geometry" segment: layer geometry and transforms.
-        static func geometrySections(for view: UIView) -> [DO.HierarchyBuiltinSection] {
-            return [geometry(view)]
+        /// "layer" segment: drawing, transform, animations, then the low-value rendering knobs.
+        static func layerSections(for view: UIView) -> [DO.HierarchyBuiltinSection] {
+            return [drawing(view), transform(view), animations(view), layerDiagnostics(view)]
         }
 
         /// "Auto Layout" segment without the runtime constraints, which the page inserts.
@@ -175,33 +179,140 @@ extension DO {
             return DO.HierarchyBuiltinSection(title: "UIView", rows: rows)
         }
 
-        // MARK: - Geometry
+        // MARK: - Layer
 
-        private static func geometry(_ view: UIView) -> DO.HierarchyBuiltinSection {
+        /// The fixed CALayer surface: borders, corners and shadow. Anything shared with the
+        /// view (alpha, backgroundColor, clipsToBounds) stays in the properties segment.
+        private static func drawing(_ view: UIView) -> DO.HierarchyBuiltinSection {
             let layer = view.layer
-            return DO.HierarchyBuiltinSection(title: "Layer", rows: [
-                row("layer.position", .point(layer.position)) { [weak view] value in
+
+            var rows: [DO.HierarchyBuiltinRow] = [
+                row("layer.class", .text(String(describing: type(of: layer)))),
+                row("cornerRadius", .double(Double(layer.cornerRadius))) { [weak view] value in
+                    guard let view = view, case let .double(number) = value else { return }
+                    view.layer.cornerRadius = CGFloat(number)
+                    view.layer.setNeedsDisplay()
+                },
+                row("cornerCurve",
+                    enumKind("CALayerCornerCurve", raw: layer.cornerCurve == .continuous ? 1 : 0)) { [weak view] value in
+                    guard let view = view, case let .enumValue(raw, _, _) = value else { return }
+                    view.layer.cornerCurve = raw == 1 ? .continuous : .circular
+                    view.layer.setNeedsDisplay()
+                },
+                row("borderWidth", .double(Double(layer.borderWidth))) { [weak view] value in
+                    guard let view = view, case let .double(number) = value else { return }
+                    view.layer.borderWidth = CGFloat(number)
+                    view.layer.setNeedsDisplay()
+                },
+            ]
+
+            if let borderColor = layer.borderColor.map({ UIColor(cgColor: $0) }) {
+                rows.append(row("borderColor", .color(borderColor)) { [weak view] value in
+                    guard let view = view, case let .color(color) = value else { return }
+                    view.layer.borderColor = color.cgColor
+                    view.layer.setNeedsDisplay()
+                })
+            }
+
+            if let shadowColor = layer.shadowColor.map({ UIColor(cgColor: $0) }) {
+                rows.append(row("shadowColor", .color(shadowColor)) { [weak view] value in
+                    guard let view = view, case let .color(color) = value else { return }
+                    view.layer.shadowColor = color.cgColor
+                    view.layer.setNeedsDisplay()
+                })
+            }
+
+            rows += [
+                row("shadowOpacity", .double(Double(layer.shadowOpacity))) { [weak view] value in
+                    guard let view = view, case let .double(number) = value else { return }
+                    view.layer.shadowOpacity = Float(number)
+                    view.layer.setNeedsDisplay()
+                },
+                row("shadowOffset", .size(layer.shadowOffset)) { [weak view] value in
+                    guard let view = view, case let .size(size) = value else { return }
+                    view.layer.shadowOffset = size
+                    view.layer.setNeedsDisplay()
+                },
+                row("shadowRadius", .double(Double(layer.shadowRadius))) { [weak view] value in
+                    guard let view = view, case let .double(number) = value else { return }
+                    view.layer.shadowRadius = CGFloat(number)
+                    view.layer.setNeedsDisplay()
+                },
+                row("shadowPath", .text(shadowPathText(layer.shadowPath))),
+            ]
+
+            return DO.HierarchyBuiltinSection(title: DO.Text.Hierarchy.sectionDrawing, rows: rows)
+        }
+
+        /// Layer position / anchor / z and both transforms. The 2D matrix is the editable side;
+        /// the 4x4 is read-only because 16 editable fields are a footgun.
+        private static func transform(_ view: UIView) -> DO.HierarchyBuiltinSection {
+            let layer = view.layer
+            let current = view.transform
+            let values = [Double(current.a), Double(current.b), Double(current.c),
+                          Double(current.d), Double(current.tx), Double(current.ty)]
+
+            return DO.HierarchyBuiltinSection(title: DO.Text.Hierarchy.sectionTransform, rows: [
+                row("position", .point(layer.position)) { [weak view] value in
                     guard let view = view, case let .point(point) = value else { return }
                     view.layer.position = point
                     refresh(view)
                 },
-                row("layer.anchorPoint", .point(layer.anchorPoint)) { [weak view] value in
+                row("anchorPoint", .point(layer.anchorPoint)) { [weak view] value in
                     guard let view = view, case let .point(point) = value else { return }
                     view.layer.anchorPoint = point
                     refresh(view)
                 },
-                row("layer.zPosition", .double(Double(layer.zPosition))) { [weak view] value in
+                row("zPosition", .double(Double(layer.zPosition))) { [weak view] value in
                     guard let view = view, case let .double(number) = value else { return }
                     view.layer.zPosition = CGFloat(number)
                     refresh(view)
                 },
-                row("layer.anchorPointZ", .double(Double(layer.anchorPointZ))) { [weak view] value in
-                    guard let view = view, case let .double(number) = value else { return }
-                    view.layer.anchorPointZ = CGFloat(number)
-                    refresh(view)
-                },
-                row("transform", .text(transformText(view.transform))),
-                row("transform3D", .text(String(describing: view.transform3D))),
+                row("transform",
+                    .text(affineCSV(values)),
+                    detail: transformText(current),
+                    write: { [weak view] value in
+                        guard let view = view, let transform = affineTransform(from: value) else { return }
+                        view.transform = transform
+                        refresh(view)
+                    },
+                    input: { [weak view] in
+                        guard let view = view else { return nil }
+                        let transform = view.transform
+                        return DO.HierarchyNumberGridView(
+                            labels: ["a", "b", "c", "d", "tx", "ty"],
+                            values: [Double(transform.a), Double(transform.b), Double(transform.c),
+                                     Double(transform.d), Double(transform.tx), Double(transform.ty)]
+                        ) { .text(affineCSV($0)) }
+                    }),
+                row("transform3D", .text(matrixText(layer.transform))),
+            ])
+        }
+
+        /// One read-only row: the keys Core Animation currently has attached to this layer.
+        private static func animations(_ view: UIView) -> DO.HierarchyBuiltinSection {
+            let keys = view.layer.animationKeys() ?? []
+            let text = keys.isEmpty ? "none" : keys.joined(separator: ", ")
+
+            return DO.HierarchyBuiltinSection(title: DO.Text.Hierarchy.sectionAnimations, rows: [
+                row("animationKeys", .text(text)),
+            ])
+        }
+
+        /// Rarely touched rendering knobs. Shown last, and badged when they explain a blurry result.
+        private static func layerDiagnostics(_ view: UIView) -> DO.HierarchyBuiltinSection {
+            let layer = view.layer
+            let scale = UIScreen.main.scale
+            let scaleMismatch = abs(layer.contentsScale - scale) > 0.01
+            let rasterMismatch = layer.shouldRasterize && abs(layer.rasterizationScale - scale) > 0.01
+
+            return DO.HierarchyBuiltinSection(title: DO.Text.Hierarchy.sectionDiagnostics, rows: [
+                row("contentsScale", .double(Double(layer.contentsScale)),
+                    badge: scaleMismatch ? badgeImage : nil),
+                row("contentsGravity", .text(layer.contentsGravity.rawValue)),
+                row("shouldRasterize", .bool(layer.shouldRasterize)),
+                row("rasterizationScale", .double(Double(layer.rasterizationScale)),
+                    badge: rasterMismatch ? badgeImage : nil),
             ])
         }
 
@@ -262,8 +373,11 @@ extension DO {
                 let vertical = hugging
                     ? view.contentHuggingPriority(for: .vertical)
                     : view.contentCompressionResistancePriority(for: .vertical)
-                return DO.HierarchyNumberGridView(labels: ["horizontal", "vertical"],
-                                                  values: [Double(horizontal.rawValue), Double(vertical.rawValue)]) {
+                return DO.HierarchyNumberGridView(
+                    labels: ["horizontal", "vertical"],
+                    values: [Double(horizontal.rawValue), Double(vertical.rawValue)],
+                    presets: DO.HierarchyEditorStyle.layoutPriorityPresets
+                ) {
                     .point(CGPoint(x: $0[0], y: $0[1]))
                 }
             }
@@ -328,13 +442,14 @@ extension DO {
         private static func row(
             _ title: String,
             _ kind: DO.ValueKind,
+            detail: String? = nil,
             write: ((DO.ValueKind) -> Void)? = nil,
             badge: UIImage? = nil,
             input: (() -> DO.HierarchyValueInput?)? = nil
         ) -> DO.HierarchyBuiltinRow {
             return DO.HierarchyBuiltinRow(
                 title: title,
-                detail: DO.HierarchyPropertyEngine.shared.displayText(of: kind),
+                detail: detail ?? DO.HierarchyPropertyEngine.shared.displayText(of: kind),
                 kind: kind,
                 write: write,
                 badge: badge,
@@ -370,6 +485,37 @@ extension DO {
             if mask.contains(.flexibleHeight) { parts.append("flexibleHeight") }
             if mask.contains(.flexibleBottomMargin) { parts.append("flexibleBottomMargin") }
             return parts.joined(separator: " | ")
+        }
+
+        private static func shadowPathText(_ path: CGPath?) -> String {
+            guard let path = path else { return "nil" }
+            return DO.HierarchyFormatterTool.string(from: path.boundingBox)
+        }
+
+        private static func affineCSV(_ values: [Double]) -> String {
+            return values.map { DO.HierarchyFormatterTool.preciseFormat(NSNumber(value: $0)) }
+                .joined(separator: ",")
+        }
+
+        private static func affineTransform(from kind: DO.ValueKind) -> CGAffineTransform? {
+            guard case let .text(csv) = kind else { return nil }
+            let values = csv.split(separator: ",").compactMap { Double($0) }
+            guard values.count == 6 else { return nil }
+            return CGAffineTransform(a: values[0], b: values[1], c: values[2],
+                                     d: values[3], tx: values[4], ty: values[5])
+        }
+
+        private static func matrixText(_ transform: CATransform3D) -> String {
+            let values = [transform.m11, transform.m12, transform.m13, transform.m14,
+                          transform.m21, transform.m22, transform.m23, transform.m24,
+                          transform.m31, transform.m32, transform.m33, transform.m34,
+                          transform.m41, transform.m42, transform.m43, transform.m44]
+            let format = { (value: CGFloat) in
+                DO.HierarchyFormatterTool.preciseFormat(NSNumber(value: Double(value)))
+            }
+            return stride(from: 0, to: values.count, by: 4)
+                .map { index in values[index..<index + 4].map(format).joined(separator: "  ") }
+                .joined(separator: "\n")
         }
 
         private static func transformText(_ transform: CGAffineTransform) -> String {

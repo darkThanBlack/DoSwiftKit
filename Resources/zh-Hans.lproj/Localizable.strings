@@ -191,10 +191,13 @@
 "hierarchy.title" = "视图结构";
 "hierarchy.detail_title" = "UI 结构";
 "hierarchy.segment.properties" = "属性";
-"hierarchy.segment.geometry" = "几何";
+"hierarchy.segment.layer" = "图层";
 "hierarchy.segment.autolayout" = "Auto Layout";
 "hierarchy.section.common" = "常用";
 "hierarchy.section.constraints" = "约束";
+"hierarchy.section.drawing" = "绘制";
+"hierarchy.section.transform" = "变换";
+"hierarchy.section.animations" = "动画";
 "hierarchy.section.diagnostics" = "诊断";
 "hierarchy.section.effective" = "生效值";
 "hierarchy.section.traits" = "特征与 RTL";

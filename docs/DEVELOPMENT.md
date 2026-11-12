@@ -135,7 +135,8 @@ unknown 天然不可编辑，无需声明）；写回要求 `userEditable` + 可
 `HierarchyConstraintEngine` 单独处理运行时集合：沿当前视图与祖先收集参与的约束，格式化方程，
 编辑 `constant` / `priority`；约束不进入 JSON。
 
-详情页按 `Properties` / `Geometry` / `Auto Layout` 三个 segment 展示，切换时重建当前 segment 的数据。
+详情页按 `Properties` / `Layer` / `Auto Layout` 三个 segment 展示，切换时重建当前 segment 的数据。
+`Layer` 段依次为 Drawing / Transform / Animations / Diagnostics，具体行见 `docs/AUTOLAYOUT-PROPERTIES.md`。
 资源查找顺序：`Bundle.main` → `DO.resourceBundle`（SPM 是 `Bundle.module`，CocoaPods 是
 `DoSwiftKitResources.bundle`）。
 

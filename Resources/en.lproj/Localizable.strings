@@ -191,10 +191,13 @@
 "hierarchy.title" = "Hierarchy";
 "hierarchy.detail_title" = "UI Structure";
 "hierarchy.segment.properties" = "Properties";
-"hierarchy.segment.geometry" = "Geometry";
+"hierarchy.segment.layer" = "Layer";
 "hierarchy.segment.autolayout" = "Auto Layout";
 "hierarchy.section.common" = "Common";
 "hierarchy.section.constraints" = "Constraints";
+"hierarchy.section.drawing" = "Drawing";
+"hierarchy.section.transform" = "Transform";
+"hierarchy.section.animations" = "Animations";
 "hierarchy.section.diagnostics" = "Diagnostics";
 "hierarchy.section.effective" = "Effective Values";
 "hierarchy.section.traits" = "Traits & RTL";

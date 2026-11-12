@@ -30,6 +30,20 @@ extension DO {
             return f
         }()
 
+        /// Editor-side numbers: the display formatter stops at 2 decimals, which would round a
+        /// rotation matrix every time one of its fields is committed.
+        private lazy var preciseNumberFormatter: NumberFormatter = {
+            let f = NumberFormatter()
+            f.numberStyle = .decimal
+            f.maximumFractionDigits = 6
+            f.usesGroupingSeparator = false
+            return f
+        }()
+
+        func preciseFormat(_ number: NSNumber) -> String {
+            preciseNumberFormatter.string(from: number) ?? "\(number)"
+        }
+
         func string(from date: Date) -> String? {
             formatter.string(from: date)
         }
@@ -52,6 +66,10 @@ extension DO {
 
         static func format(_ number: NSNumber) -> String {
             shared.format(number)
+        }
+
+        static func preciseFormat(_ number: NSNumber) -> String {
+            shared.preciseFormat(number)
         }
 
         static func string(from frame: CGRect) -> String {

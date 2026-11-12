@@ -79,6 +79,9 @@ extension DO {
 
     enum HierarchyEditorStyle {
 
+        /// Documented UIKit priorities plus 25, a low value that is otherwise awkward to type.
+        static let layoutPriorityPresets: [Double] = [1000, 750, 250, 50, 25]
+
         static let padding: CGFloat = 20
         static let rowGap: CGFloat = 14
 

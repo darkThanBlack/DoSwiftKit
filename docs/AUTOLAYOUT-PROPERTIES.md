@@ -1,69 +1,105 @@
-# 几何 segment 属性计划
+# 图层 segment 内容计划（Layer）
 
-用于决定「几何」segment 最终要展示/编辑哪些属性。最后一列由你手动标记：
-**不需要的属性填 `x`**，留空表示待定。
+原「几何」段只覆盖 position / anchorPoint / transform，名称和内容都偏窄，现改为 **Layer（图层）**，
+以 `view.layer` 为锚点，按「常用 → 诊断」排序。本文记录最终形态与已实现的取舍。
 
-图例：
-
-- 读写：`读/写` = 有公开 setter；`只读` = getter only；`方法` = 通过方法读写。
-- 现有编辑器：2 格 = 点编辑器；数字 = `HierarchyNumberFieldView`；无 = 需要新增。
-- 状态：已实现 / 待升级 / 候选新增。
+图例：`读/写` 可编辑；`只读` 仅展示。编辑器沿用现有输入控件，不新增 cell。
 
 ---
 
-## 1. 现状（已实现）
+## 1. Segment 结构（已实现）
 
-| 属性 | 类型 | 作用 | 读写 | 现有编辑器 | 状态 | 不需要做（手标） |
-|---|---|---|---|---|---|---|
-| `layer.position` | CGPoint | layer 在父 layer 坐标系中的位置，受 `anchorPoint` 影响 | 读/写 | 2 格 | 已实现 | |
-| `layer.anchorPoint` | CGPoint | 锚点，默认 (0.5, 0.5)；影响 position 与旋转/缩放中心 | 读/写 | 2 格 | 已实现 | |
-| `layer.zPosition` | CGFloat | layer 在 z 轴上的层级 | 读/写 | 数字 | 已实现 | |
-| `layer.anchorPointZ` | CGFloat | 3D 锚点的 z 值 | 读/写 | 数字 | 已实现 | |
-| `transform` | CGAffineTransform | 仿射变换；`frame` 由 bounds/center/transform 派生，transform 非 identity 时 frame 不可靠 | 读/写 | 无（当前只读文本） | 待升级 | |
-| `transform3D` | CATransform3D | 3D 变换；iOS 上等价于 `layer.transform` | 读/写 | 无（当前只读文本） | 待升级 | |
+| 顺序 | Section | 定位 |
+|---|---|---|
+| 1 | Drawing（绘制） | 圆角、边框、阴影——命中率最高的 layer 属性 |
+| 2 | Transform（变换） | 位置 / 锚点 / z 轴 + 2D / 3D 变换 |
+| 3 | Animations（动画） | 当前 layer 挂着的 CAAnimation keys，只读 |
+| 4 | Diagnostics（诊断） | 4 个渲染参数，很少改，出问题时才看 |
+
+与 Properties 段重叠的一律不放：`alpha` / `backgroundColor` / `isOpaque` / `clipsToBounds`
+（= `masksToBounds`）都在 Properties 段编辑。
 
 ---
 
-## 2. 计划修改
+## 2. Drawing
 
-### 2.1 `transform` 升级为 6 格编辑器
+| 行 | 类型 | 读写 | 说明 |
+|---|---|---|---|
+| `layer.class` | text | 只读 | 暴露 `layerClass` 被子类替换的情况（`AVPlayerLayer` / 业务自定义） |
+| `cornerRadius` | double | 读/写 | |
+| `cornerCurve` | enum | 读/写 | `circular` / `continuous`（iOS 13） |
+| `borderWidth` | double | 读/写 | |
+| `borderColor` | color | 读/写 | `CGColor` 转 `UIColor`；为 nil 时不显示该行 |
+| `shadowColor` | color | 读/写 | 同上 |
+| `shadowOpacity` | double | 读/写 | Float |
+| `shadowOffset` | size | 读/写 | 2 格 |
+| `shadowRadius` | double | 读/写 | |
+| `shadowPath` | text | 只读 | 显示 boundingBox，未设置时 `nil` |
 
-| 项 | 内容 |
+写入后走 `layer.setNeedsDisplay()`，不触发 layout。
+
+---
+
+## 3. Transform
+
+| 行 | 类型 | 读写 | 说明 |
+|---|---|---|---|
+| `position` | point | 读/写 | 父 layer 坐标系 |
+| `anchorPoint` | point | 读/写 | 旋转 / 缩放中心 |
+| `zPosition` | double | 读/写 | |
+| `transform` | 6 格：a / b / c / d / tx / ty | 读/写 | 写 `view.transform`；行摘要沿用 `a 1  b 0 …` 形式 |
+| `transform3D` | 4×4 文本 | 只读 | 16 个可编辑框误操作成本高 |
+
+- `view.transform` 与 `layer.transform` 是同一份矩阵，只保留一处可写；
+- 编辑器数值使用 6 位小数格式，避免每次提交都把旋转分量按 2 位小数取整。
+
+---
+
+## 4. Animations
+
+单行只读：`animationKeys` 的返回值直接拼成字符串，空时为 `none`。
+
+```swift
+view.layer.animationKeys()  // ["opacity", "position"]
+```
+
+限制（已确认）：
+
+- 动画播完（`isRemovedOnCompletion`）就从 keys 里消失，只能看到存活中的动画；
+- `UIView.animate` 装的动画可见，但 transform 动画是 additive，`from` 是增量；
+- `.repeat` 的 repeatCount 是 `FLT_MAX`，后续若展开详情需要显示成 ∞。
+
+---
+
+## 5. Diagnostics
+
+| 行 | 类型 | 徽标条件 |
+|---|---|---|
+| `contentsScale` | double | 与屏幕 scale 不一致 |
+| `contentsGravity` | text | 无 |
+| `shouldRasterize` | bool | 无 |
+| `rasterizationScale` | double | `shouldRasterize == true` 且与屏幕 scale 不一致 |
+
+这四项回答的是「为什么糊了 / 为什么变形了」：手写 sublayer 的 `contentsScale` 默认 1.0，
+`shouldRasterize` 开了但 `rasterizationScale` 没跟上，都会让渲染发虚。
+
+---
+
+## 6. 明确不做
+
+| 项 | 原因 |
 |---|---|
-| 输入 | `HierarchyNumberGridView`，labels：`a / b / c / d / tx / ty` |
-| 写入 | `view.transform = CGAffineTransform(a:b:c:d:tx:ty:)` |
-| 实现 | 内置行已有自定义 `input` / `write`，不需要新增 `ValueKind` |
-| 注意 | transform 非 identity 时 `frame` 不可靠；编辑后 frame 行会跟着变 |
-| 建议 | 可做 |
-
-### 2.2 `transform3D` 改为矩阵展示
-
-| 项 | 内容 |
-|---|---|
-| 展示 | 4×4 矩阵，`m11 … m44`，只读 |
-| 编辑 | 不提供；16 个值误操作成本高，且与 `transform` 重叠 |
-| 实现 | `.text(...)`，用格式化函数拼接 |
-| 建议 | 只读展示 |
+| `masksToBounds` / `opacity` / `backgroundColor` / `isOpaque` | 与 UIView 属性同源，Properties 段已有 |
+| `contentsRect` / `contentsCenter` / `contentsFormat` | 极低频 |
+| `maskedCorners` | OptionSet，现有编辑器表达不了 |
+| `minificationFilter` / `magnificationFilter` / filters | 纹理与合成细节，调试价值低 |
+| `isDoubleSided` / `isGeometryFlipped` / `allowsEdgeAntialiasing` | 3D 与模拟器场景 |
+| 动画编辑 / 移除 | 只读快照，避免改变业务状态 |
 
 ---
 
-## 3. 候选新增
+## 7. 待定
 
-| 属性 | 类型 | 作用 | 读写 | 建议 | 不需要做（手标） |
-|---|---|---|---|---|---|
-| `layer.bounds` | CGRect | layer 自身坐标系中的矩形；正常情况下与 `view.bounds` 一致 | 读/写 | 只读展示，用于确认 transform 后的实际值 | |
-| `layer.frame` | CGRect | 由 position / bounds / anchorPoint / transform 派生 | 读/写 | 只读展示，与 `view.frame` 对照 | |
-| `layer.isGeometryFlipped` | Bool | 子 layer 的 y 轴是否翻转 | 读/写 | 只读展示；极冷门 | |
-| `layer.affineTransform()` | CGAffineTransform | 从 `layer.transform` 提取的仿射部分 | 方法 | 只读展示；与 `transform` 重复，可不要 | |
-
----
-
-## 4. 明确不做
-
-| 属性 | 原因 |
-|---|---|
-| `layer.cornerRadius` / `borderWidth` / `shadow*` | 外观/描边，不属于布局几何 |
-| `layer.contentsScale` / `rasterizationScale` / `shouldRasterize` | 渲染相关，不影响布局 |
-| `layer.mask` / `sublayers` / `subLayerTransform` | 模型结构，不是标量属性 |
-| `view.center` / `frame` / `bounds` | 已在 Auto Layout 段展示，避免重复 |
-| `layer.position` / `anchorPoint` 的 3D 扩展 | 当前已覆盖 `anchorPointZ`，其余无公开 API |
+- **Sublayers 列表**：直接子层（类名 + name + bounds）可作为下一节；点击进二级页展示该层属性。
+- **layer 属性进 JSON**：与 `types` 同 schema 增加 `layers` 键，覆盖 `layerClass` 被子类替换的场景；
+  基础 CALayer 属性继续代码写死。

@@ -21,10 +21,18 @@ extension DO {
         private let fields: [DO.HierarchyNumberFieldView]
         private let compose: ([Double]) -> DO.ValueKind
 
-        init(labels: [String], values: [Double], compose: @escaping ([Double]) -> DO.ValueKind) {
+        /// `presets` is one list shared by every field: each row renders the same chip strip,
+        /// and there is deliberately no per-row preset list to line up with `labels`.
+        init(
+            labels: [String],
+            values: [Double],
+            presets: [Double] = [],
+            compose: @escaping ([Double]) -> DO.ValueKind
+        ) {
             self.compose = compose
             self.fields = values.map {
-                DO.HierarchyNumberFieldView(isInteger: false, step: 1, value: $0, prominent: false)
+                DO.HierarchyNumberFieldView(isInteger: false, step: 1, value: $0,
+                                            prominent: false, presets: presets)
             }
             super.init(frame: .zero)
             setupSubviews(labels: labels)
@@ -45,10 +53,14 @@ extension DO {
 
                 let row = UIStackView(arrangedSubviews: [name, field])
                 row.axis = .horizontal
-                row.alignment = .center
+                // Top aligned: a field with a preset strip below is taller than one input row,
+                // and the label should stay level with the input, not the whole column.
+                row.alignment = .top
                 row.spacing = 12
 
-                name.widthAnchor.constraint(equalToConstant: 64).isActive = true
+                // 76 fits the longest label in use ("horizontal") at 12pt SF Mono.
+                name.widthAnchor.constraint(equalToConstant: 76).isActive = true
+                name.heightAnchor.constraint(equalToConstant: 40).isActive = true
                 return row
             }
 
