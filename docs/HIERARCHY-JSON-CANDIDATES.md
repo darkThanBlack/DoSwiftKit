@@ -12,7 +12,7 @@
 | 命中率 | 真实业务页面上经常出现、出问题时常被怀疑的对象 |
 | 能读到 | 引擎走 KVC，取不到的 key 整行跳过；高版本属性在低版本自动消失，不会崩 |
 | 能写回 | 需同时满足 `userEditable`、可解析 `ValueKind`、真实 setter，缺一即只读 |
-| 不重复 | 已在父类条目里声明的 key 不再写进子类，否则同一属性会出现两行 |
+| 不重复 | 已在父类条目里声明的 key 不再写进子类；也不能和代码层 Properties / Layer / Layout 三段的行重名，否则同一屏出现两行 |
 
 ## 2. 本轮已补（P0）
 
@@ -53,6 +53,9 @@
 
 新增枚举表：`UIDatePickerStyle`、`UISwitchStyle`。
 
+同时删掉了 `UILabel.shadowColor` / `shadowOffset`：它们是文字阴影，但和 Layer 段的图层阴影同名，
+出现在同一屏里只会互相干扰。`testJSONKeysDoNotRepeatBuiltinRows` 会拦住这类重名。
+
 ## 3. 剩余候选（未做）
 
 | 类 | key | 备注 |
@@ -83,7 +86,8 @@
   没有访问器，于是抛 `NSUnknownKeyException`。这类 key 一律不进 JSON。
 - `UITextField` 的同一批 traits 属性可以正常 KVC 读取，所以 `keyboardType` 等只挂在 `UITextField`
   条目上。
-- 新增 key 前先跑一遍 `testEveryJSONEntryIsKVCReadable`，它会遍历所有条目做完整读取。
+- 新增 key 前先跑一遍 `testEveryJSONEntryIsKVCReadable`，它会遍历所有条目做完整读取；
+  再跑 `testJSONKeysDoNotRepeatBuiltinRows`，确认没有和代码段撞名。
 
 ## 6. 落地格式
 

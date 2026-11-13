@@ -92,6 +92,8 @@ xcconfig 一起抹掉，表现是 `Unable to find module dependency: 'DoSwift'`�
   - 条目：`{ 类名: { properties: [KVC keyPath], overrides: { key: { enumType, userEditable, desc } } } }`
   - `enums`：`{ 枚举名: { rawValue: 名称 } }`，只支持 Int raw；`CAShapeLayer.lineCap` 这类
     String raw 枚举直接显示原始值、标 `userEditable: false`
+  - 行名不能和代码层三段（Properties / Layer / Layout）的行重名，父类条目已声明的 key 也不写进子类，
+    否则同一屏出现两行
 - **`HierarchyPropertyEngine`**：按对象选树（`CALayer` → `layers`，其余 → `views`），按类继承链匹配、
   KVC 读值，输出 `HierarchyCategoryModel` / `HierarchyCellModel`；`userEditable: false` 只用于
   「kind 可编辑、但属性只读或无 setter」的 key（image / attributedText / unknown 天然不可编辑，

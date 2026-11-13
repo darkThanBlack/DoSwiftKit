@@ -91,11 +91,9 @@ final class HierarchyPropertyGroupTests: XCTestCase {
                        "automatic")
     }
 
-    /// Every JSON key must survive a KVC read: UIKit forwards some selectors (the text input
-    /// traits on `UITextView` / `UISearchBar`, for instance) without registering them as methods,
-    /// and KVC raises `NSUnknownKeyException` for those instead of returning nil.
-    func testEveryJSONEntryIsKVCReadable() {
-        let objects: [NSObject] = [
+    /// One instance per class that has a JSON entry.
+    private func inspectableObjects() -> [NSObject] {
+        return [
             UILabel(), UIControl(), UIButton(type: .system), UIImageView(), UITextField(),
             UISlider(), UISwitch(), UIActivityIndicatorView(), UIProgressView(), UIPageControl(),
             UIStepper(), UIScrollView(), UITableView(), UITableViewCell(style: .default, reuseIdentifier: nil),
@@ -104,9 +102,35 @@ final class HierarchyPropertyGroupTests: XCTestCase {
             UINavigationBar(), UIToolbar(), UITabBar(), UISearchBar(),
             UIWindow(frame: .zero), UISegmentedControl(items: ["a"]), UIStackView(),
         ]
+    }
 
-        for object in objects {
+    /// Every JSON key must survive a KVC read: UIKit forwards some selectors (the text input
+    /// traits on `UITextView` / `UISearchBar`, for instance) without registering them as methods,
+    /// and KVC raises `NSUnknownKeyException` for those instead of returning nil.
+    func testEveryJSONEntryIsKVCReadable() {
+        for object in inspectableObjects() {
             _ = DO.HierarchyPropertyEngine.shared.categoryModels(for: object)
+        }
+    }
+
+    /// The three segments share one screen, so a JSON key that repeats a code-built row shows
+    /// up twice (UILabel's text shadow used to sit next to the layer's shadow).
+    func testJSONKeysDoNotRepeatBuiltinRows() {
+        let view = UIView()
+        view.backgroundColor = .white
+        view.tintColor = .systemBlue
+
+        let builtinTitles = Set(
+            DO.HierarchyBuiltinSections.propertySections(for: view).flatMap(\.rows).map(\.title)
+            + DO.HierarchyBuiltinSections.layerSections(for: view).flatMap(\.rows).map(\.title)
+            + DO.HierarchyBuiltinSections.autoLayoutSections(for: view).flatMap(\.rows).map(\.title)
+        )
+
+        for object in inspectableObjects() {
+            let titles = DO.HierarchyPropertyEngine.shared.categoryModels(for: object)
+                .flatMap(\.items).compactMap(\.title)
+            let repeated = Set(titles).intersection(builtinTitles).sorted()
+            XCTAssertTrue(repeated.isEmpty, "\(type(of: object)) repeats builtin rows: \(repeated)")
         }
     }
 

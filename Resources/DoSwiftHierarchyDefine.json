@@ -16,8 +16,6 @@
         "lineBreakMode",
         "minimumScaleFactor",
         "highlightedTextColor",
-        "shadowColor",
-        "shadowOffset",
         "preferredMaxLayoutWidth"
       ],
       "overrides": {
