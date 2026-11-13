@@ -95,7 +95,15 @@ extension DO {
             super.viewDidAppear(animated)
 
             snapshot = DO.ScreenSampler.snapshot(of: DO.HierarchyPlugin.shared.appWindow)
-            refreshAll()
+
+            // Only the handle may acquire a view. Returning from a presented page keeps the
+            // cached selection and its borders, so no hit test runs here.
+            if infoView.selectedView == nil {
+                pickSelection()
+            } else {
+                refreshAlignRuler()
+                refreshColor()
+            }
         }
 
         deinit {
@@ -116,7 +124,11 @@ extension DO {
         /// Re-applies the current selection after `stopObservingAll()`; the borders are rebuilt
         /// so a re-shown panel matches what the picker points at.
         func resumeSelection() {
-            applySelection(pickerView.selectedView())
+            if infoView.selectedView == nil {
+                pickSelection()
+            } else {
+                refreshAll()
+            }
         }
 
         private func beginObserving(_ view: UIView, borderWidth: CGFloat) {
@@ -191,10 +203,18 @@ extension DO {
             }
         }
 
+        /// Re-applies the cached selection; never asks the picker to hit-test again.
         private func refreshAll() {
             refreshAlignRuler()
             refreshColor()
+            applySelection(infoView.selectedView)
+        }
+
+        /// The only path that acquires a view from the picker: the user moved the handle.
+        private func pickSelection() {
             applySelection(pickerView.selectedView())
+            refreshAlignRuler()
+            refreshColor()
         }
 
         private func refreshColor() {
@@ -310,7 +330,7 @@ extension DO.HierarchyViewController: DO.PickerViewDelegate {
     }
 
     func pickerDidMove(_ picker: DO.PickerView) {
-        refreshAll()
+        pickSelection()
     }
 
     func pickerDidEndDrag(_ picker: DO.PickerView) {
@@ -321,6 +341,10 @@ extension DO.HierarchyViewController: DO.PickerViewDelegate {
 }
 
 extension DO.HierarchyViewController: DO.HierarchyInfoViewDelegate {
+
+    func hierarchyInfoViewDidSelectTree(_ view: DO.HierarchyInfoView) {
+        showTree()
+    }
 
     func hierarchyInfoViewDidSelectParent(_ view: DO.HierarchyInfoView) {
         guard let selectedView = infoView.selectedView else { return }
@@ -355,6 +379,26 @@ extension DO.HierarchyViewController: DO.HierarchyInfoViewDelegate {
         let nav = UINavigationController(rootViewController: vc)
         nav.modalPresentationStyle = .fullScreen
         present(nav, animated: true)
+    }
+
+    private func showTree() {
+        guard let selected = infoView.selectedView else { return }
+
+        let vc = DO.HierarchyTreeViewController(focused: selected)
+        vc.onConfirm = { [weak self] view in
+            self?.focus(on: view)
+        }
+
+        let nav = UINavigationController(rootViewController: vc)
+        nav.modalPresentationStyle = .fullScreen
+        present(nav, animated: true)
+    }
+
+    /// Applies a view chosen from the tree. Never hit-tests the picker.
+    private func focus(on view: UIView) {
+        applySelection(view)
+        refreshAlignRuler()
+        refreshColor()
     }
 
     private func showHierarchyInfo(_ selectView: UIView) {

@@ -48,6 +48,9 @@ extension DO {
 
         var isIgnorePrivateClass: Bool = true
 
+        /// Ancestor levels shown when the tree page opens. `0` roots it at the topmost view.
+        var treeParentLevels: Int = 0
+
         private static let defaultsKey = "kHierarchyConfig"
 
         static func load() -> DO.HierarchyConfig {
@@ -66,7 +69,7 @@ extension DO {
         private enum CodingKeys: String, CodingKey {
             case isColorPickEnabled, loupeVisibility
             case isAlignRulerEnabled, rulerVisibility
-            case isIgnorePrivateClass
+            case isIgnorePrivateClass, treeParentLevels
         }
 
         init(from decoder: Decoder) throws {
@@ -83,6 +86,8 @@ extension DO {
                 ?? fallback.rulerVisibility
             isIgnorePrivateClass = try container.decodeIfPresent(Bool.self, forKey: .isIgnorePrivateClass)
                 ?? fallback.isIgnorePrivateClass
+            treeParentLevels = try container.decodeIfPresent(Int.self, forKey: .treeParentLevels)
+                ?? fallback.treeParentLevels
         }
 
         init() {}

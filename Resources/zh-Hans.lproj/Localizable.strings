@@ -226,6 +226,9 @@
 "hierarchy.key.text_color" = "textColor";
 "hierarchy.key.font" = "font";
 "hierarchy.key.tag" = "tag";
+"hierarchy.button.tree" = "树";
+"hierarchy.tree.title" = "视图树";
+"hierarchy.tree.focus" = "聚焦";
 "hierarchy.button.parents" = "父视图";
 "hierarchy.button.children" = "子视图";
 "hierarchy.button.more" = "更多";

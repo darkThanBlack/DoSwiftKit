@@ -14,6 +14,7 @@ import UIKit
 extension DO {
 
     protocol HierarchyInfoViewDelegate: AnyObject {
+        func hierarchyInfoViewDidSelectTree(_ view: DO.HierarchyInfoView)
         func hierarchyInfoViewDidSelectParent(_ view: DO.HierarchyInfoView)
         func hierarchyInfoViewDidSelectSubview(_ view: DO.HierarchyInfoView)
         func hierarchyInfoViewDidSelectMoreInfo(_ view: DO.HierarchyInfoView)
@@ -47,6 +48,7 @@ extension DO {
             apply("font", of: view, to: fontRow)
             apply("tag", of: view, to: tagRow)
 
+            treeButton.isEnabled = true
             parentButton.isEnabled = view.superview != nil
             subviewsButton.isEnabled = !view.subviews.isEmpty
             moreButton.isEnabled = true
@@ -95,6 +97,10 @@ extension DO {
             ])
         }
 
+        @objc private func treeTapped() {
+            delegate?.hierarchyInfoViewDidSelectTree(self)
+        }
+
         @objc private func parentTapped() {
             delegate?.hierarchyInfoViewDidSelectParent(self)
         }
@@ -141,7 +147,7 @@ extension DO {
         }()
 
         private lazy var actionStack: UIStackView = {
-            let stack = UIStackView(arrangedSubviews: [parentButton, subviewsButton, moreButton])
+            let stack = UIStackView(arrangedSubviews: [treeButton, parentButton, subviewsButton, moreButton])
             stack.axis = .horizontal
             stack.distribution = .fillEqually
             stack.spacing = 8
@@ -184,6 +190,9 @@ extension DO {
         private lazy var fontRow = HierarchyInfoRowView(key: DO.Text.Hierarchy.keyFont)
         private lazy var tagRow = HierarchyInfoRowView(key: DO.Text.Hierarchy.keyTag)
 
+        private lazy var treeButton = makeActionButton(
+            title: DO.Text.Hierarchy.tree, symbol: "list.bullet.indent", action: #selector(treeTapped)
+        )
         private lazy var parentButton = makeActionButton(
             title: DO.Text.Hierarchy.parents, symbol: "arrow.up", action: #selector(parentTapped)
         )

@@ -15,14 +15,6 @@ extension DO {
 
     // MARK: - Node contract
 
-    /// Minimum the path bar needs: a display name. No id — identity stays in the business
-    /// model, which the browser hands back untouched for you to cast.
-    protocol PathNode {
-
-        /// nil or empty = nothing to show (path bar draws a placeholder, the row hides it).
-        var nodeName: String? { get }
-    }
-
     /// Node kind
     enum FileNodeKind: Equatable {
 

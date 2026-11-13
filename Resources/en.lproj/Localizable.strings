@@ -226,6 +226,9 @@
 "hierarchy.key.text_color" = "Text Color:";
 "hierarchy.key.font" = "Font:";
 "hierarchy.key.tag" = "Tag:";
+"hierarchy.button.tree" = "Tree";
+"hierarchy.tree.title" = "View Tree";
+"hierarchy.tree.focus" = "Focus";
 "hierarchy.button.parents" = "Parents";
 "hierarchy.button.children" = "Children";
 "hierarchy.button.more" = "More";

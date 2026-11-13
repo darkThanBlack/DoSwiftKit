@@ -15,7 +15,9 @@ DoSwift/
 │   ├── DO.swift                   # public enum DO {} —— 全库命名空间
 │   ├── AppInfo/                   # App / 设备 / 权限信息
 │   ├── Common/                    # 通用组件
-│   │   ├── FileBrowser/           # 文件浏览器（路径栏 + 列表 + 三个协议）
+│   │   ├── FileBrowser/           # 文件浏览器（列表 + 三个协议）
+│   │   ├── PathBar/               # 面包屑（PathBarView + PathNode，与领域无关）
+│   │   ├── Tree/                  # 通用树视图（collection + 自定义 layout + 默认 cell）
 │   │   └── Trend/                 # 趋势图（浮窗折线 / 单行文本，报表叠泳道）
 │   ├── Console/                   # 日志采集与控制台
 │   ├── Hierarchy/                 # UI 结构检查器（JSON 数据驱动）
@@ -99,6 +101,12 @@ xcconfig 一起抹掉，表现是 `Unable to find module dependency: 'DoSwift'`�
 - **详情页**：`Properties` / `Layer` / `Auto Layout` 三个 segment，切换时重建当前 segment 的数据。
   `Layer` 段固定四节：Drawing / Transform / Animations / Diagnostics；绘制走 `layer.setNeedsDisplay()`，
   动画只读 `animationKeys()`，诊断节只放 `contentsScale` / `contentsGravity` / `shouldRasterize` / `rasterizationScale`。
+  只读行点击会把值复制到剪贴板（`UIPasteboard` + 轻触反馈）。
+- **视图树**：信息面板的 `Tree` 按钮全屏打开 `HierarchyTreeViewController`；树由通用控件
+  `DO.TreeView`（`Code/Common/Tree`）渲染，`HierarchyTreeDataSource` 把 `UIView` 树接进去。
+  行点击＝聚焦 + 展开/收起，行尾「聚焦」按钮＝确认返回；面包屑复用 `DO.PathBarView`。
+  初始深度取 `HierarchyConfig.treeParentLevels`（默认 0 = 从最顶层/窗口开始），单次手势只沿一个轴滚动。
+  父/子视图按钮暂时保留，人工测试通过后删除。
 - **数值输入**：`HierarchyNumberFieldView` 可带 `presets: [Double]`，字段下方渲染一行 28pt 扁 chips
   （横向滚动、不换行），点击只回填输入框，仍由 Done 提交；`HierarchyNumberGridView` 收同一份预设，
   每个字段各渲染一行。预设只收一份值列表，不做 `labels` / `values` 双数组对齐。

@@ -116,8 +116,13 @@ extension DO {
 
         private func row(for item: DO.HierarchyBuiltinRow) -> Row {
             guard let write = item.write else {
-                return Row(cellClass: DO.KeyValueCell.self) { cell in
+                let text = item.detail.isEmpty ? item.title : item.detail
+                return Row(
+                    cellClass: DO.KeyValueCell.self,
+                    onTrigger: { [weak self] _ in self?.copyToPasteboard(text) }
+                ) { cell in
                     cell.update(title: item.title, detail: item.detail, rightImage: item.badge)
+                    cell.selectionStyle = .default
                 }
             }
 
@@ -163,6 +168,13 @@ extension DO {
             present(card, animated: true)
         }
 
+        /// Read-only rows copy their value; the cell flash comes from `selectionStyle`.
+        private func copyToPasteboard(_ text: String?) {
+            guard let text = text, !text.isEmpty else { return }
+            UIPasteboard.general.string = text
+            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+        }
+
         private func makeInput(for kind: DO.ValueKind) -> DO.HierarchyValueInput? {
             if case let .enumValue(raw, table, _) = kind,
                let options = DO.HierarchyBuiltinSections.enumTables[table] {
@@ -188,9 +200,14 @@ extension DO {
 
         private func row(for item: DO.HierarchyCellModel, target: NSObject) -> Row {
             guard let edit = item.edit else {
-                return Row(cellClass: DO.KeyValueCell.self) { cell in
+                let text = item.detailTitle ?? item.title
+                return Row(
+                    cellClass: DO.KeyValueCell.self,
+                    onTrigger: { [weak self] _ in self?.copyToPasteboard(text) }
+                ) { cell in
                     cell.update(item)
                     cell.separatorInset = item.separatorInsets
+                    cell.selectionStyle = .default
                 }
             }
 

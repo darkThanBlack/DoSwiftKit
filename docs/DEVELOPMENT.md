@@ -137,6 +137,14 @@ unknown 天然不可编辑，无需声明）；写回要求 `userEditable` + 可
 `HierarchyConstraintEngine` 单独处理运行时集合：沿当前视图与祖先收集参与的约束，格式化方程，
 编辑 `constant` / `priority`；约束不进入 JSON。
 
+视图树：信息面板的 `Tree` 按钮全屏打开 `HierarchyTreeViewController`。树本身是通用控件
+`DO.TreeView`（`Code/Common/Tree`），数据源是纯查询，展开集合、选中项和祖先路径由控件持有；
+`HierarchyTreeDataSource` 负责把 `UIView` 接进去，面包屑复用 `DO.PathBarView`。行点击＝聚焦并
+展开/收起，行尾「聚焦」按钮确认返回；初始深度取 `HierarchyConfig.treeParentLevels`（0 = 最顶层），
+单次手势只沿一个轴滚动。父/子视图按钮暂时保留。
+
+详情页的只读行点击会复制其值到剪贴板。
+
 详情页按 `Properties` / `Layer` / `Auto Layout` 三个 segment 展示，切换时重建当前 segment 的数据。
 `Layer` 段依次为 Drawing / Transform / Animations / Diagnostics，具体行见 `docs/AUTOLAYOUT-PROPERTIES.md`。
 资源查找顺序：`Bundle.main` → `DO.resourceBundle`（SPM 是 `Bundle.module`，CocoaPods 是

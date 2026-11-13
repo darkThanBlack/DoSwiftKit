@@ -47,16 +47,6 @@ extension DO {
 
         // MARK: - Font
 
-        /// Crumb text; the current one is bolder.
-        static func pathFont(isCurrent: Bool) -> UIFont {
-            let font = UIFont.preferredFont(forTextStyle: .footnote)
-            guard isCurrent,
-                  let descriptor = font.fontDescriptor.withSymbolicTraits(.traitBold) else {
-                return font
-            }
-            return UIFont(descriptor: descriptor, size: 0)
-        }
-
         /// State text.
         static var stateFont: UIFont { return UIFont.preferredFont(forTextStyle: .footnote) }
 

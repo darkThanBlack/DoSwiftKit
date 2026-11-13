@@ -78,7 +78,7 @@ extension DO {
         private let contentInset: CGFloat = 16.0
 
         private func loadViews(in box: UIView) {
-            box.backgroundColor = DO.FileBrowserStyle.backgroundColor
+            box.backgroundColor = DO.PathBarStyle.backgroundColor
 
             box.addSubview(scrollView)
             box.addSubview(leftFade)
@@ -193,15 +193,15 @@ extension DO {
             }()
             label.numberOfLines = 1
             label.lineBreakMode = .byTruncatingMiddle  // keep the tail visible
-            label.font = DO.FileBrowserStyle.pathFont(isCurrent: isCurrent)
-            label.textColor = isCurrent ? DO.FileBrowserStyle.themeColor : DO.FileBrowserStyle.lightTextColor
+            label.font = DO.PathBarStyle.font(isCurrent: isCurrent)
+            label.textColor = isCurrent ? DO.PathBarStyle.currentTextColor : DO.PathBarStyle.textColor
             return label
         }
 
         private func makeSeparator() -> UIImageView {
-            let view = UIImageView(image: DO.FileBrowserStyle.arrowImage())
+            let view = UIImageView(image: DO.PathBarStyle.separatorImage())
             view.contentMode = .scaleAspectFit
-            view.tintColor = DO.FileBrowserStyle.disabledTextColor
+            view.tintColor = DO.PathBarStyle.separatorColor
             view.isUserInteractionEnabled = false
             return view
         }
@@ -227,13 +227,13 @@ extension DO {
 
         /// Leading fade: background to clear, pinned to the viewport edge.
         private lazy var leftFade = FadeView(
-            background: DO.FileBrowserStyle.backgroundColor,
+            background: DO.PathBarStyle.backgroundColor,
             reversed: false
         )
 
         /// Trailing fade.
         private lazy var rightFade = FadeView(
-            background: DO.FileBrowserStyle.backgroundColor,
+            background: DO.PathBarStyle.backgroundColor,
             reversed: true
         )
     }
