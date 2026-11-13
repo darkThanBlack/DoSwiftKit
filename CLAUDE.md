@@ -120,7 +120,8 @@ xcconfig 一起抹掉，表现是 `Unable to find module dependency: 'DoSwift'`�
 
 数据驱动的取舍（已知、可接受）：
 - 丢编译期类型检查——枚举 rawValue 是裸 int，靠 JSON 里的名字自解释
-- KVC 边界：纯 Swift（非 `@objc`）属性读不到，只显示到父类层
+- KVC 边界：纯 Swift（非 `@objc`）属性读不到，只显示到父类层；`UITextView` / `UISearchBar` 的
+  输入特性靠在类之外转发实现，`responds(to:)` 为真但 KVC 会抛 `NSUnknownKeyException`，不能进 JSON
 
 ## 文案与国际化
 

@@ -46,4 +46,78 @@ final class HierarchyPropertyGroupTests: XCTestCase {
         let models = DO.HierarchyPropertyEngine.shared.categoryModels(for: view)
         XCTAssertFalse(models.contains { $0.title == "UIStackView" })
     }
+
+    func testScrollGeometryIsReadableAndWritable() {
+        let scrollView = UIScrollView()
+        scrollView.contentSize = CGSize(width: 100, height: 400)
+
+        let section = DO.HierarchyPropertyEngine.shared.categoryModels(for: scrollView)
+            .first { $0.title == "UIScrollView" }
+
+        let offset = section?.items.first { $0.title == "contentOffset" }
+        XCTAssertNotNil(offset?.edit)
+
+        XCTAssertEqual(section?.items.first { $0.title == "contentSize" }?.detailTitle,
+                       "W: 100   H: 400")
+
+        // Derived or gesture-driven values stay read-only.
+        XCTAssertNil(section?.items.first { $0.title == "adjustedContentInset" }?.edit)
+        XCTAssertNil(section?.items.first { $0.title == "isDragging" }?.edit)
+    }
+
+    func testWindowLevelIsExposed() {
+        let window = UIWindow(frame: CGRect(x: 0, y: 0, width: 100, height: 100))
+        let section = DO.HierarchyPropertyEngine.shared.categoryModels(for: window)
+            .first { $0.title == "UIWindow" }
+
+        XCTAssertNotNil(section?.items.first { $0.title == "windowLevel" }?.edit)
+    }
+
+    func testCollectionViewSelectionFlagsAreWritable() {
+        let view = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
+        let section = DO.HierarchyPropertyEngine.shared.categoryModels(for: view)
+            .first { $0.title == "UICollectionView" }
+
+        XCTAssertNotNil(section?.items.first { $0.title == "allowsMultipleSelection" }?.edit)
+        XCTAssertNotNil(section?.items.first { $0.title == "isPrefetchingEnabled" }?.edit)
+    }
+
+    func testDatePickerStyleUsesItsEnumTable() {
+        let picker = UIDatePicker()
+        let section = DO.HierarchyPropertyEngine.shared.categoryModels(for: picker)
+            .first { $0.title == "UIDatePicker" }
+
+        XCTAssertEqual(section?.items.first { $0.title == "preferredDatePickerStyle" }?.detailTitle,
+                       "automatic")
+    }
+
+    /// Every JSON key must survive a KVC read: UIKit forwards some selectors (the text input
+    /// traits on `UITextView` / `UISearchBar`, for instance) without registering them as methods,
+    /// and KVC raises `NSUnknownKeyException` for those instead of returning nil.
+    func testEveryJSONEntryIsKVCReadable() {
+        let objects: [NSObject] = [
+            UILabel(), UIControl(), UIButton(type: .system), UIImageView(), UITextField(),
+            UISlider(), UISwitch(), UIActivityIndicatorView(), UIProgressView(), UIPageControl(),
+            UIStepper(), UIScrollView(), UITableView(), UITableViewCell(style: .default, reuseIdentifier: nil),
+            UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout()),
+            UICollectionReusableView(), UITextView(), UIDatePicker(), UIPickerView(),
+            UINavigationBar(), UIToolbar(), UITabBar(), UISearchBar(),
+            UIWindow(frame: .zero), UISegmentedControl(items: ["a"]), UIStackView(),
+        ]
+
+        for object in objects {
+            _ = DO.HierarchyPropertyEngine.shared.categoryModels(for: object)
+        }
+    }
+
+    func testSuperclassKeysAreNotRepeatedInSubclassSections() {
+        let textView = UITextView()
+        let models = DO.HierarchyPropertyEngine.shared.categoryModels(for: textView)
+
+        // `isScrollEnabled` is declared once, on UIScrollView, and inherited by text views.
+        let owners = models.filter { section in
+            section.items.contains { $0.title == "isScrollEnabled" }
+        }
+        XCTAssertEqual(owners.map(\.title), ["UIScrollView"])
+    }
 }

@@ -8,6 +8,8 @@
         "font",
         "textAlignment",
         "numberOfLines",
+        "adjustsFontSizeToFitWidth",
+        "allowsDefaultTighteningForTruncation",
         "isEnabled",
         "isHighlighted",
         "baselineAdjustment",
@@ -15,7 +17,8 @@
         "minimumScaleFactor",
         "highlightedTextColor",
         "shadowColor",
-        "shadowOffset"
+        "shadowOffset",
+        "preferredMaxLayoutWidth"
       ],
       "overrides": {
         "textAlignment": {
@@ -35,7 +38,11 @@
         "contentVerticalAlignment",
         "isSelected",
         "isEnabled",
-        "isHighlighted"
+        "isHighlighted",
+        "isTracking",
+        "isTouchInside",
+        "showsMenuAsPrimaryAction",
+        "isContextMenuInteractionEnabled"
       ],
       "overrides": {
         "contentHorizontalAlignment": {
@@ -43,6 +50,12 @@
         },
         "contentVerticalAlignment": {
           "enumType": "UIControlContentVerticalAlignment"
+        },
+        "isTracking": {
+          "userEditable": false
+        },
+        "isTouchInside": {
+          "userEditable": false
         }
       }
     },
@@ -63,7 +76,9 @@
         "lineBreakMode",
         "contentEdgeInsets",
         "titleEdgeInsets",
-        "imageEdgeInsets"
+        "imageEdgeInsets",
+        "configuration",
+        "menu"
       ],
       "overrides": {
         "buttonType": {
@@ -92,9 +107,17 @@
       "properties": [
         "image",
         "highlightedImage",
-        "isHighlighted"
+        "isAnimating",
+        "animationDuration",
+        "animationRepeatCount",
+        "isHighlighted",
+        "preferredSymbolConfiguration"
       ],
-      "overrides": {}
+      "overrides": {
+        "isAnimating": {
+          "userEditable": false
+        }
+      }
     },
     "UITextField": {
       "properties": [
@@ -118,7 +141,11 @@
         "keyboardAppearance",
         "returnKeyType",
         "enablesReturnKeyAutomatically",
-        "isSecureTextEntry"
+        "isSecureTextEntry",
+        "leftView",
+        "rightView",
+        "inputView",
+        "inputAccessoryView"
       ],
       "overrides": {
         "textAlignment": {
@@ -165,8 +192,15 @@
       "properties": [
         "isOn",
         "onTintColor",
-        "thumbTintColor"
-      ]
+        "thumbTintColor",
+        "preferredStyle"
+      ],
+      "overrides": {
+        "preferredStyle": {
+          "enumType": "UISwitchStyle",
+          "userEditable": false
+        }
+      }
     },
     "UIActivityIndicatorView": {
       "properties": [
@@ -221,6 +255,14 @@
     },
     "UIScrollView": {
       "properties": [
+        "contentOffset",
+        "contentSize",
+        "contentInset",
+        "adjustedContentInset",
+        "zoomScale",
+        "minimumZoomScale",
+        "maximumZoomScale",
+        "scrollIndicatorInsets",
         "indicatorStyle",
         "showsHorizontalScrollIndicator",
         "showsVerticalScrollIndicator",
@@ -228,13 +270,19 @@
         "isPagingEnabled",
         "isDirectionalLockEnabled",
         "bounces",
+        "bouncesZoom",
+        "scrollsToTop",
         "alwaysBounceHorizontal",
         "alwaysBounceVertical",
-        "minimumZoomScale",
-        "maximumZoomScale",
+        "decelerationRate",
         "delaysContentTouches",
         "canCancelContentTouches",
-        "keyboardDismissMode"
+        "keyboardDismissMode",
+        "refreshControl",
+        "isTracking",
+        "isDragging",
+        "isDecelerating",
+        "isZooming"
       ],
       "overrides": {
         "indicatorStyle": {
@@ -242,6 +290,21 @@
         },
         "keyboardDismissMode": {
           "enumType": "UIScrollViewKeyboardDismissMode"
+        },
+        "adjustedContentInset": {
+          "userEditable": false
+        },
+        "isTracking": {
+          "userEditable": false
+        },
+        "isDragging": {
+          "userEditable": false
+        },
+        "isDecelerating": {
+          "userEditable": false
+        },
+        "isZooming": {
+          "userEditable": false
         }
       }
     },
@@ -252,14 +315,24 @@
         "separatorStyle",
         "separatorColor",
         "separatorInset",
+        "separatorEffect",
         "allowsSelection",
         "allowsMultipleSelection",
         "allowsSelectionDuringEditing",
         "allowsMultipleSelectionDuringEditing",
         "sectionIndexMinimumDisplayRowCount",
+        "sectionIndexColor",
+        "sectionIndexBackgroundColor",
         "rowHeight",
+        "estimatedRowHeight",
         "sectionHeaderHeight",
-        "sectionFooterHeight"
+        "estimatedSectionHeaderHeight",
+        "sectionFooterHeight",
+        "estimatedSectionFooterHeight",
+        "isEditing",
+        "backgroundView",
+        "tableHeaderView",
+        "tableFooterView"
       ],
       "overrides": {
         "numberOfSections": {
@@ -280,6 +353,14 @@
         "selectionStyle",
         "accessoryType",
         "editingAccessoryType",
+        "isSelected",
+        "isHighlighted",
+        "isEditing",
+        "accessoryView",
+        "editingAccessoryView",
+        "backgroundView",
+        "selectedBackgroundView",
+        "contentConfiguration",
         "indentationLevel",
         "indentationWidth",
         "shouldIndentWhileEditing",
@@ -304,7 +385,13 @@
     "UICollectionView": {
       "properties": [
         "numberOfSections",
-        "collectionViewLayout"
+        "collectionViewLayout",
+        "allowsSelection",
+        "allowsMultipleSelection",
+        "allowsSelectionDuringEditing",
+        "allowsMultipleSelectionDuringEditing",
+        "isPrefetchingEnabled",
+        "dragInteractionEnabled"
       ],
       "overrides": {
         "numberOfSections": {
@@ -332,32 +419,15 @@
         "textAlignment",
         "isEditable",
         "isSelectable",
-        "autocapitalizationType",
-        "autocorrectionType",
-        "keyboardType",
-        "keyboardAppearance",
-        "returnKeyType",
-        "enablesReturnKeyAutomatically",
-        "isSecureTextEntry"
+        "textContainerInset",
+        "dataDetectorTypes"
       ],
       "overrides": {
         "textAlignment": {
           "enumType": "NSTextAlignment"
         },
-        "autocapitalizationType": {
-          "enumType": "UITextAutocapitalizationType"
-        },
-        "autocorrectionType": {
-          "enumType": "UITextAutocorrectionType"
-        },
-        "keyboardType": {
-          "enumType": "UIKeyboardType"
-        },
-        "keyboardAppearance": {
-          "enumType": "UIKeyboardAppearance"
-        },
-        "returnKeyType": {
-          "enumType": "UIReturnKeyType"
+        "dataDetectorTypes": {
+          "userEditable": false
         }
       }
     },
@@ -368,7 +438,12 @@
         "date",
         "minimumDate",
         "maximumDate",
-        "countDownDuration"
+        "preferredDatePickerStyle",
+        "roundsToMinuteInterval",
+        "countDownDuration",
+        "locale",
+        "calendar",
+        "timeZone"
       ],
       "overrides": {
         "datePickerMode": {
@@ -376,21 +451,39 @@
         },
         "countDownDuration": {
           "userEditable": false
+        },
+        "preferredDatePickerStyle": {
+          "enumType": "UIDatePickerStyle"
         }
       }
     },
     "UIPickerView": {
       "properties": [
-        "delegate"
+        "delegate",
+        "numberOfComponents",
+        "showsSelectionIndicator"
       ],
-      "overrides": {}
+      "overrides": {
+        "numberOfComponents": {
+          "userEditable": false
+        },
+        "showsSelectionIndicator": {
+          "userEditable": false
+        }
+      }
     },
     "UINavigationBar": {
       "properties": [
         "barStyle",
         "isTranslucent",
         "prefersLargeTitles",
-        "barTintColor"
+        "barTintColor",
+        "backIndicatorImage",
+        "shadowImage",
+        "titleTextAttributes",
+        "largeTitleTextAttributes",
+        "standardAppearance",
+        "topItem"
       ],
       "overrides": {
         "barStyle": {
@@ -415,9 +508,13 @@
         "barStyle",
         "isTranslucent",
         "barTintColor",
+        "unselectedItemTintColor",
         "itemPositioning",
         "itemWidth",
-        "itemSpacing"
+        "itemSpacing",
+        "items",
+        "selectedItem",
+        "standardAppearance"
       ],
       "overrides": {
         "barStyle": {
@@ -441,9 +538,8 @@
         "showsBookmarkButton",
         "showsCancelButton",
         "showsScopeBar",
-        "autocapitalizationType",
-        "autocorrectionType",
-        "keyboardType"
+        "scopeButtonTitles",
+        "selectedScopeButtonIndex"
       ],
       "overrides": {
         "searchBarStyle": {
@@ -451,25 +547,22 @@
         },
         "barStyle": {
           "enumType": "UIBarStyle"
-        },
-        "autocapitalizationType": {
-          "enumType": "UITextAutocapitalizationType"
-        },
-        "autocorrectionType": {
-          "enumType": "UITextAutocorrectionType"
-        },
-        "keyboardType": {
-          "enumType": "UIKeyboardType"
         }
       }
     },
     "UIWindow": {
       "properties": [
         "isKeyWindow",
+        "windowLevel",
+        "windowScene",
+        "canResizeToFitContent",
         "rootViewController"
       ],
       "overrides": {
         "isKeyWindow": {
+          "userEditable": false
+        },
+        "canResizeToFitContent": {
           "userEditable": false
         }
       }
@@ -479,6 +572,7 @@
         "isMomentary",
         "numberOfSegments",
         "selectedSegmentIndex",
+        "selectedSegmentTintColor",
         "apportionsSegmentWidthsByContent"
       ],
       "overrides": {
@@ -749,6 +843,17 @@
       "5": "trailing",
       "6": "bottom",
       "7": "lastBaseline"
+    },
+    "UIDatePickerStyle": {
+      "0": "automatic",
+      "1": "wheels",
+      "2": "compact",
+      "3": "inline"
+    },
+    "UISwitchStyle": {
+      "0": "automatic",
+      "1": "checkbox",
+      "2": "sliding"
     }
   }
 }
