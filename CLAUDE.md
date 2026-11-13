@@ -105,7 +105,8 @@ xcconfig 一起抹掉，表现是 `Unable to find module dependency: 'DoSwift'`�
 - **视图树**：信息面板的 `Tree` 按钮全屏打开 `HierarchyTreeViewController`；树由通用控件
   `DO.TreeView`（`Code/Common/Tree`）渲染，`HierarchyTreeDataSource` 把 `UIView` 树接进去。
   行点击＝聚焦 + 展开/收起，行尾「聚焦」按钮＝确认返回；面包屑复用 `DO.PathBarView`。
-  初始深度取 `HierarchyConfig.treeParentLevels`（默认 0 = 从最顶层/窗口开始），单次手势只沿一个轴滚动。
+  初始深度取 `HierarchyConfig.treeParentLevels`（默认 0 = 不限制，一直展示到最顶层/窗口；
+  设置页 View Hierarchy 组的「树父级层数」弹 0–8 选项改这一项，cell 上直接显示数字），单次手势只沿一个轴滚动。
   父/子视图按钮暂时保留，人工测试通过后删除。
 - **数值输入**：`HierarchyNumberFieldView` 可带 `presets: [Double]`，字段下方渲染一行 28pt 扁 chips
   （横向滚动、不换行），点击只回填输入框，仍由 Done 提交；`HierarchyNumberGridView` 收同一份预设，

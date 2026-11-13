@@ -140,8 +140,9 @@ unknown 天然不可编辑，无需声明）；写回要求 `userEditable` + 可
 视图树：信息面板的 `Tree` 按钮全屏打开 `HierarchyTreeViewController`。树本身是通用控件
 `DO.TreeView`（`Code/Common/Tree`），数据源是纯查询，展开集合、选中项和祖先路径由控件持有；
 `HierarchyTreeDataSource` 负责把 `UIView` 接进去，面包屑复用 `DO.PathBarView`。行点击＝聚焦并
-展开/收起，行尾「聚焦」按钮确认返回；初始深度取 `HierarchyConfig.treeParentLevels`（0 = 最顶层），
-单次手势只沿一个轴滚动。父/子视图按钮暂时保留。
+展开/收起，行尾「聚焦」按钮确认返回；初始深度取 `HierarchyConfig.treeParentLevels`（0 = 不限制，
+一直展示到最顶层），设置页 View Hierarchy 组的「树父级层数」弹 0–8 选项改这一项，值直接显示在
+cell 右侧，随配置存进 UserDefaults；单次手势只沿一个轴滚动。父/子视图按钮暂时保留。
 
 详情页的只读行点击会复制其值到剪贴板。
 

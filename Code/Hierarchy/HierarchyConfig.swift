@@ -48,7 +48,7 @@ extension DO {
 
         var isIgnorePrivateClass: Bool = true
 
-        /// Ancestor levels shown when the tree page opens. `0` roots it at the topmost view.
+        /// Most ancestors shown when the tree page opens; `0` means no limit (up to the topmost view).
         var treeParentLevels: Int = 0
 
         private static let defaultsKey = "kHierarchyConfig"

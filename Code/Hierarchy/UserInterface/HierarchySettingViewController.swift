@@ -23,6 +23,7 @@ extension DO {
             enum Kind {
                 case toggle(WritableKeyPath<DO.HierarchyConfig, Bool>)
                 case selector(WritableKeyPath<DO.HierarchyConfig, DO.HierarchyConfig.Visibility>)
+                case levels(WritableKeyPath<DO.HierarchyConfig, Int>)
             }
 
             let title: String
@@ -56,6 +57,9 @@ extension DO {
                 Item(title: DO.Text.Hierarchy.ignorePrivateClasses,
                      detail: DO.Text.Hierarchy.ignorePrivateDetail,
                      kind: .toggle(\.isIgnorePrivateClass)),
+                Item(title: DO.Text.Hierarchy.treeParentLevels,
+                     detail: DO.Text.Hierarchy.treeParentLevelsDetail,
+                     kind: .levels(\.treeParentLevels)),
             ]),
         ]
 
@@ -70,9 +74,7 @@ extension DO {
             sections = groups.enumerated().map { index, group in
                 Section(
                     title: group.title,
-                    footer: index == groups.count - 1
-                        ? DO.Text.Hierarchy.settingsFooter
-                        : nil,
+                    footer: nil,
                     rows: group.items.map(makeRow)
                 )
             }
@@ -101,6 +103,18 @@ extension DO {
                         value: DO.HierarchyPlugin.shared.config[keyPath: keyPath].title
                     )
                 }
+
+            case .levels(let keyPath):
+                return Row(
+                    cellClass: DO.SelectorCell.self,
+                    onTrigger: { [weak self] _ in self?.pickLevels(item, keyPath: keyPath) }
+                ) { cell in
+                    cell.update(
+                        title: item.title,
+                        detail: item.detail,
+                        value: "\(DO.HierarchyPlugin.shared.config[keyPath: keyPath])"
+                    )
+                }
             }
         }
 
@@ -114,6 +128,20 @@ extension DO {
             reloadSections()
             onChange?()
         }
+
+        private func pickLevels(_ item: Item, keyPath: WritableKeyPath<DO.HierarchyConfig, Int>) {
+            DO.HierarchyActionSheet.present(
+                from: self,
+                title: item.title,
+                actions: Self.levelOptions.map { "\($0)" }
+            ) { [weak self] index in
+                guard let self = self, Self.levelOptions.indices.contains(index) else { return }
+                self.update { $0[keyPath: keyPath] = Self.levelOptions[index] }
+            }
+        }
+
+        /// Anything past the ancestor chain clamps to the topmost view, so a short list is enough.
+        private static let levelOptions = Array(0...8)
 
         private func pick(_ item: Item, keyPath: WritableKeyPath<DO.HierarchyConfig, DO.HierarchyConfig.Visibility>) {
             let options = DO.HierarchyConfig.Visibility.allCases

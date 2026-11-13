@@ -17,8 +17,9 @@ extension DO {
     /// the tree and the breadcrumb always agree on ids and depths.
     enum HierarchyTreeChain {
 
-        /// `0` roots the tree at the topmost ancestor (normally the window); `N` roots it N
-        /// levels above the focused view. The value comes from `HierarchyConfig.treeParentLevels`.
+        /// `0` means no limit: the tree runs up to the topmost ancestor (normally the window).
+        /// `N` roots it N levels above the focused view; values past the top clamp there.
+        /// The value comes from `HierarchyConfig.treeParentLevels`.
         static func rootIndex(chainCount: Int, parentLevels: Int) -> Int {
             guard chainCount > 0 else { return 0 }
             guard parentLevels > 0 else { return chainCount - 1 }

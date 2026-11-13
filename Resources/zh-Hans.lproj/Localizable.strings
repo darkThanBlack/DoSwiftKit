@@ -189,19 +189,19 @@
 
 /* Hierarchy */
 "hierarchy.title" = "视图结构";
-"hierarchy.detail_title" = "UI 结构";
+"hierarchy.detail_title" = "视图详情";
 "hierarchy.segment.properties" = "属性";
 "hierarchy.segment.layer" = "图层";
-"hierarchy.segment.autolayout" = "Auto Layout";
-"hierarchy.section.common" = "常用";
+"hierarchy.segment.autolayout" = "布局";
+"hierarchy.section.core" = "重要";
 "hierarchy.section.constraints" = "约束";
 "hierarchy.section.drawing" = "绘制";
 "hierarchy.section.transform" = "变换";
 "hierarchy.section.animations" = "动画";
 "hierarchy.section.diagnostics" = "诊断";
-"hierarchy.section.effective" = "生效值";
-"hierarchy.section.traits" = "特征与 RTL";
-"hierarchy.info_title" = "UI 层级";
+"hierarchy.section.effective" = "特性";
+"hierarchy.section.traits" = "环境变量";
+"hierarchy.info_title" = "当前焦点";
 "hierarchy.visibility.never" = "从不";
 "hierarchy.visibility.while_dragging" = "拖动时";
 "hierarchy.visibility.always" = "始终";
@@ -217,7 +217,8 @@
 "hierarchy.settings.align_ruler_detail" = "面板里显示到四边的距离，并启用标尺";
 "hierarchy.settings.cross_lines_detail" = "标尺出现的时机";
 "hierarchy.settings.ignore_private_detail" = "跳过类名以下划线开头的视图";
-"hierarchy.settings.footer" = "立即生效，并记录在 UserDefaults 里。";
+"hierarchy.settings.tree_parent_levels" = "树父级层数";
+"hierarchy.settings.tree_parent_levels_detail" = "视图树向上展示的父级层数，0 表示不限制";
 "hierarchy.key.position" = "position";
 "hierarchy.key.name" = "name";
 "hierarchy.key.pixel" = "color";
@@ -231,7 +232,7 @@
 "hierarchy.tree.focus" = "聚焦";
 "hierarchy.button.parents" = "父视图";
 "hierarchy.button.children" = "子视图";
-"hierarchy.button.more" = "更多";
+"hierarchy.button.detail" = "详情";
 "hierarchy.sheet.parents" = "父级视图";
 "hierarchy.sheet.subviews" = "子视图";
 "hierarchy.alert.note" = "提示";
@@ -246,7 +247,7 @@
 "hierarchy.constraints.title" = "约束";
 "hierarchy.constraints.constant" = "Constant";
 "hierarchy.constraints.priority" = "Priority";
-"hierarchy.constraints.empty" = "该视图没有参与任何约束。";
+"hierarchy.constraints.empty" = "该视图没有参与任何约束";
 "hierarchy.constraints.inactive" = "未启用";
 
 /* UserDefaults */

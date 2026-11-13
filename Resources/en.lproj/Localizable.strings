@@ -188,12 +188,12 @@
 "console.level.fault" = "Fault";
 
 /* Hierarchy */
-"hierarchy.title" = "Hierarchy";
-"hierarchy.detail_title" = "UI Structure";
+"hierarchy.title" = "UI Hierarchy";
+"hierarchy.detail_title" = "View Detail";
 "hierarchy.segment.properties" = "Properties";
 "hierarchy.segment.layer" = "Layer";
-"hierarchy.segment.autolayout" = "Auto Layout";
-"hierarchy.section.common" = "Common";
+"hierarchy.segment.autolayout" = "Layout";
+"hierarchy.section.core" = "Core";
 "hierarchy.section.constraints" = "Constraints";
 "hierarchy.section.drawing" = "Drawing";
 "hierarchy.section.transform" = "Transform";
@@ -201,7 +201,7 @@
 "hierarchy.section.diagnostics" = "Diagnostics";
 "hierarchy.section.effective" = "Effective Values";
 "hierarchy.section.traits" = "Traits & RTL";
-"hierarchy.info_title" = "UI Hierarchy";
+"hierarchy.info_title" = "Current focus";
 "hierarchy.visibility.never" = "Never";
 "hierarchy.visibility.while_dragging" = "While Dragging";
 "hierarchy.visibility.always" = "Always";
@@ -217,7 +217,8 @@
 "hierarchy.settings.align_ruler_detail" = "Distances to the four edges in the panel, plus the cross lines";
 "hierarchy.settings.cross_lines_detail" = "When the ruler lines appear";
 "hierarchy.settings.ignore_private_detail" = "Skip views whose class name starts with an underscore";
-"hierarchy.settings.footer" = "Applied immediately and remembered in UserDefaults.";
+"hierarchy.settings.tree_parent_levels" = "Tree Parent Levels";
+"hierarchy.settings.tree_parent_levels_detail" = "Ancestor levels shown above the focused view; 0 = unlimited";
 "hierarchy.key.position" = "Position:";
 "hierarchy.key.name" = "Name:";
 "hierarchy.key.pixel" = "Pixel:";
@@ -231,7 +232,7 @@
 "hierarchy.tree.focus" = "Focus";
 "hierarchy.button.parents" = "Parents";
 "hierarchy.button.children" = "Children";
-"hierarchy.button.more" = "More";
+"hierarchy.button.detail" = "Detail";
 "hierarchy.sheet.parents" = "Parent Views";
 "hierarchy.sheet.subviews" = "Subviews";
 "hierarchy.alert.note" = "Note";
