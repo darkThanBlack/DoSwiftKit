@@ -157,6 +157,7 @@ SPM 侧：`swift build --triple arm64-apple-ios13.0-simulator --sdk "$SDK"`（�
 
 - `README.md` 英文（GitHub 默认展示），`README-zh-CN.md` 简中，两份内容保持同步
 - `docs/DEVELOPMENT.md`：架构、打包口径、国际化、验证命令
+- `docs/HIERARCHY-JSON-CANDIDATES.md`：Hierarchy JSON 还能补哪些 UIView / CALayer 子类属性
 
 ## 原 DoKit-iOS 源码路径
 
