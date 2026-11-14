@@ -15,7 +15,14 @@ This project is
 
 ## Preview
 
-![main_menu](https://github.com/darkThanBlack/DoSwiftKit/blob/main/docs/images/menu-phone.png?raw=true)   ![ui-hierarchy](https://github.com/darkThanBlack/DoSwiftKit/blob/main/docs/images/ui-hierarchy.png?raw=true)
+<p align="center">
+  <a>
+    <img src="https://github.com/darkThanBlack/DoSwiftKit/blob/main/docs/images/menu-phone.png?raw=true" width="140" alt="main menu">
+  </a>
+  <a>
+    <img src="https://github.com/darkThanBlack/DoSwiftKit/blob/main/docs/images/ui-hierarchy.png?raw=true" width="380" alt="UI Hierarchy">
+  </a>
+</p>
 
 
 
