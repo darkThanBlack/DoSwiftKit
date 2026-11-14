@@ -7,6 +7,7 @@
 <meta name="description" content="DoSwift is a pure-Swift, zero-dependency iOS debugging toolkit. Live view inspection, network capture, console, performance, sandbox and more — one floating button.">
 <script>
   (function () {
+    document.documentElement.classList.add('js');
     try {
       var saved = localStorage.getItem('doswift-theme');
       var dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -100,6 +101,7 @@ html { scroll-behavior: smooth; }
 body {
   margin: 0;
   min-width: 300px;
+  overflow-x: clip;
   background:
     radial-gradient(1000px 620px at 82% -8%, var(--glow) 0%, transparent 62%),
     radial-gradient(900px 600px at -12% 28%, var(--glow-2) 0%, transparent 58%),
@@ -166,6 +168,9 @@ img { max-width: 100%; }
 }
 .icon-btn:hover { border-color: var(--line-strong); transform: translateY(-1px); }
 .icon-btn svg { width: 16px; height: 16px; }
+.lang-btn { font-size: 12px; font-weight: 650; letter-spacing: 0; }
+.lang-btn span { line-height: 1; }
+html:not(.js) .lang-btn { display: none; }
 
 /* ============================================================
    Hero
@@ -237,9 +242,9 @@ img { max-width: 100%; }
 
 .stage { position: relative; display: flex; justify-content: center; align-items: center; }
 .stage-glow {
-  position: absolute; width: 94%; aspect-ratio: 1; border-radius: 50%;
+  position: absolute; width: 100%; aspect-ratio: 1; border-radius: 50%;
   background: radial-gradient(circle, var(--glow) 0%, var(--glow-2) 38%, transparent 70%);
-  filter: blur(26px); transform: scale(1.25); pointer-events: none;
+  filter: blur(32px); pointer-events: none;
 }
 
 /* ============================================================
@@ -263,6 +268,7 @@ img { max-width: 100%; }
 .device__screen {
   position: relative;
   width: 100%; height: 100%;
+  display: flex; flex-direction: column;
   overflow: hidden;
   border-radius: 46px;
   background: var(--ios-bg);
@@ -320,19 +326,21 @@ img { max-width: 100%; }
    iOS mock primitives
    ============================================================ */
 .tool {
-  position: absolute; top: 44px; left: 0; right: 0; bottom: 0;
+  position: relative;
+  flex: 1; min-height: 0;
+  margin: 44px 0 20px;
   display: flex; flex-direction: column;
   overflow: hidden;
   background: var(--ios-bg);
 }
-.tool.grouped { background: var(--ios-grouped); }
+.tool.tool--grouped { background: var(--ios-grouped); }
 .view {
   position: absolute; inset: 0;
   display: flex; flex-direction: column;
   background: var(--ios-bg);
   transition: transform .32s cubic-bezier(.32, .72, 0, 1), opacity .32s ease;
 }
-.tool.grouped .view { background: var(--ios-grouped); }
+.tool.tool--grouped .view { background: var(--ios-grouped); }
 .view.is-pushed { transform: translateX(100%); opacity: 0; pointer-events: none; }
 .view.is-behind { transform: translateX(-26%); opacity: .62; }
 
@@ -343,7 +351,7 @@ img { max-width: 100%; }
   background: var(--ios-bg);
   z-index: 20;
 }
-.tool.grouped .navbar { background: var(--ios-grouped); }
+.tool.tool--grouped .navbar { background: var(--ios-grouped); }
 .navbar::after {
   content: ""; position: absolute; left: 0; right: 0; bottom: 0;
   height: 0.5px; background: var(--ios-sep);
@@ -375,7 +383,6 @@ img { max-width: 100%; }
 .scroll::-webkit-scrollbar { display: none; }
 .grouped {
   background: var(--ios-grouped);
-  min-height: 100%;
   padding: 14px 14px 30px;
 }
 .sec-title {
@@ -437,7 +444,7 @@ img { max-width: 100%; }
   flex: none; padding: 7px 14px 10px;
   background: var(--ios-bg);
 }
-.tool.grouped .searchrow { background: var(--ios-grouped); }
+.tool.tool--grouped .searchrow { background: var(--ios-grouped); }
 .searchbar {
   height: 34px; border-radius: 9px; background: var(--ios-fill2);
   display: flex; align-items: center; gap: 6px; padding: 0 8px;
@@ -577,7 +584,7 @@ img { max-width: 100%; }
 .handle-glass svg { width: 20px; height: 20px; }
 .menu-panel {
   position: absolute; top: 205px; right: 0;
-  width: 62.5%; height: 52%;
+  width: 62.5%; height: 48%;
   min-height: 260px;
   border-radius: 14px;
   background: var(--ios-card);
@@ -665,7 +672,7 @@ img { max-width: 100%; }
 .toolbar-btn.is-muted { color: var(--ios-label2); }
 .statusline {
   flex: none; padding: 2px 10px 5px; background: var(--ios-bg);
-  font-family: var(--mono); font-size: 7.5px; color: var(--ios-label2);
+  font-family: var(--mono); font-size: 8px; color: var(--ios-label2);
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 
@@ -815,16 +822,16 @@ img { max-width: 100%; }
 .lane-base { stroke: var(--ios-sep); stroke-width: .5; }
 .lane-label {
   position: absolute; top: -1px; left: 1px;
-  font-size: 7px; font-weight: 650; color: var(--ios-label2); letter-spacing: 0.02em;
+  font-size: 8px; font-weight: 650; color: var(--ios-label2); letter-spacing: 0.02em;
 }
 .lane-max {
   position: absolute; top: -1px; right: 1px;
-  font-family: var(--mono); font-size: 6.5px; color: var(--ios-label2);
+  font-family: var(--mono); font-size: 7px; color: var(--ios-label2);
 }
 .timeline-times {
   display: flex; justify-content: space-between;
   padding-top: 3px;
-  font-family: var(--mono); font-size: 6.5px; color: var(--ios-label2);
+  font-family: var(--mono); font-size: 7px; color: var(--ios-label2);
 }
 .scope-card {
   margin-top: 10px; background: var(--ios-card); border-radius: 10px;
@@ -970,12 +977,12 @@ html[data-theme="dark"] .hs-badge { color: #ffb340; }
 .hs-val { color: var(--ios-label); min-width: 0; overflow: hidden; text-overflow: ellipsis; }
 .hs-val.is-color { display: inline-flex; align-items: center; gap: 4px; }
 .hs-swatch { width: 8px; height: 8px; border-radius: 2px; box-shadow: inset 0 0 0 0.5px rgba(0, 0, 0, 0.18); flex: none; }
-.hs-actions { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; margin-top: 7px; }
+.hs-actions { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 5px; margin-top: 7px; }
 .hs-action {
   height: 28px; border: 0; border-radius: 7px; background: var(--ios-fill2);
   display: flex; align-items: center; justify-content: center; gap: 3px;
   color: var(--ios-label); font-family: inherit; font-size: 8.5px; font-weight: 550;
-  cursor: pointer;
+  cursor: pointer; min-width: 0; overflow: hidden; white-space: nowrap;
 }
 .hs-action:active { opacity: .65; }
 .hs-action svg { width: 11px; height: 11px; color: var(--ios-label2); }
@@ -1066,6 +1073,11 @@ html[data-theme="dark"] .tree-row.is-focused { background: rgba(10, 132, 255, 0.
   background: linear-gradient(180deg, var(--text) 36%, var(--h1-to) 100%);
   -webkit-background-clip: text; background-clip: text; color: transparent;
 }
+html[data-lang="zh"] .section-title {
+  font-size: clamp(32px, 4.2vw, 50px);
+  line-height: 1.12;
+  letter-spacing: -0.03em;
+}
 .section-sub {
   margin: 16px 0 0; max-width: 52ch;
   font-size: 15.5px; line-height: 1.55; color: var(--muted);
@@ -1078,7 +1090,7 @@ html[data-theme="dark"] .tree-row.is-focused { background: rgba(10, 132, 255, 0.
   border: 1px solid var(--line);
   background: var(--shot-bg);
   box-shadow: 0 1px 0 rgba(255, 255, 255, 0.35) inset;
-  display: flex; flex-direction: column;
+  display: block;
   min-width: 0;
 }
 html[data-theme="dark"] .shot { box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) inset; }
@@ -1103,7 +1115,7 @@ html[data-theme="dark"] .shot { box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) in
   flex: none; max-width: 42%;
   font-size: 9.5px; line-height: 1.25; color: var(--muted); text-align: right;
 }
-.shot > .device { align-self: center; max-width: 336px; }
+.shot > .device { width: 336px; max-width: 100%; margin: 0 auto; }
 .shot:hover > .device { transform: translateY(-3px); }
 .shot--wide { grid-column: 1 / -1; padding: 16px 20px 24px; }
 .shot--wide .shot-head { padding-bottom: 8px; }
@@ -1119,8 +1131,8 @@ html[data-theme="dark"] .shot { box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) in
   100% { box-shadow: 0 1px 0 rgba(255, 255, 255, 0.35) inset; }
 }
 
-.reveal { opacity: 0; transform: translateY(20px); transition: opacity .75s ease, transform .75s cubic-bezier(.2, .8, .2, 1); }
-.reveal.in { opacity: 1; transform: none; }
+html.js .reveal { opacity: 0; transform: translateY(20px); transition: opacity .75s ease, transform .75s cubic-bezier(.2, .8, .2, 1); }
+html.js .reveal.in { opacity: 1; transform: none; }
 
 /* ============================================================
    Footer
@@ -1139,7 +1151,25 @@ html[data-theme="dark"] .shot { box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) in
   font-weight: 700; letter-spacing: -0.04em; line-height: 1.05;
 }
 .install-card .eyebrow { margin-bottom: 0; }
-.install-lines { display: grid; gap: 10px; min-width: 0; }
+.install-lines { display: grid; gap: 11px; min-width: 0; }
+.code-block {
+  min-width: 0; overflow: hidden;
+  border-radius: 12px; border: 1px solid var(--line);
+  background: var(--glass);
+}
+.code-head {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 10px; padding: 8px 10px 2px 12px;
+}
+.code-head .code-label { border-right: 0; padding-right: 0; }
+.code-body {
+  margin: 0; padding: 4px 12px 12px;
+  font-family: var(--mono); font-size: 11px; line-height: 1.6;
+  color: var(--text); white-space: pre; tab-size: 2;
+  overflow-x: auto; scrollbar-width: none;
+}
+.code-body::-webkit-scrollbar { display: none; }
+.code-body code { font-family: inherit; color: inherit; }
 .code-line {
   display: flex; align-items: center; gap: 12px;
   min-width: 0; padding: 10px 12px;
@@ -1221,13 +1251,30 @@ html[data-theme="dark"] .shot { box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) in
   .chips { gap: 6px; }
   .actions .btn { flex: 1; min-width: 150px; }
   .code-line { gap: 8px; }
-  .code-label { display: none; }
+  .code-line .code-label { display: none; }
   .footer-bottom { gap: 8px 16px; }
+}
+@media (min-width: 861px) and (max-height: 940px) {
+  .hero { min-height: 0; padding-top: 44px; padding-bottom: 56px; }
+  .device--hero { max-width: 326px; }
+  .hero h1 { font-size: clamp(60px, 7.4vw, 92px); }
+}
+@media (max-width: 560px) {
+  .segmented { width: 170px; height: 28px; }
+  .seg { height: 24px; font-size: 9px; }
+  .hs-info { left: 7px; right: 7px; }
+  .hs-row { font-size: 8.2px; }
+  .hs-action { font-size: 8px; gap: 2px; }
+  .hs-action svg { width: 10px; height: 10px; }
+}
+@media (max-width: 359px) {
+  .ghost-btn { width: 34px; padding: 0; justify-content: center; }
+  .ghost-btn span { display: none; }
 }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
-  .reveal { opacity: 1; transform: none; }
+  html.js .reveal { opacity: 1; transform: none; }
 }
 </style>
 </head>
@@ -1276,8 +1323,8 @@ html[data-theme="dark"] .shot { box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) in
       <span>DoSwift</span>
     </a>
     <nav class="topnav" aria-label="Primary">
-      <a href="#screens">Screens</a>
-      <a href="https://github.com/darkThanBlack/DoSwiftKit#readme" target="_blank" rel="noreferrer">Documentation</a>
+      <a href="#screens" data-i18n="nav.tools">Tools</a>
+      <a href="https://github.com/darkThanBlack/DoSwiftKit#readme" target="_blank" rel="noreferrer" data-i18n="nav.docs">Documentation</a>
       <a href="https://github.com/darkThanBlack/DoSwiftKit" target="_blank" rel="noreferrer">GitHub</a>
     </nav>
     <div class="top-actions">
@@ -1285,6 +1332,7 @@ html[data-theme="dark"] .shot { box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) in
         <svg><use href="#i-arrow-ur"/></svg>
         <span>GitHub</span>
       </a>
+      <button class="icon-btn lang-btn" id="langBtn" type="button" aria-label="Switch to Chinese"><span id="langLabel">中</span></button>
       <button class="icon-btn" id="themeBtn" type="button" aria-label="Toggle light or dark appearance">
         <svg id="themeIcon"><use href="#i-moon"/></svg>
       </button>
@@ -1295,20 +1343,20 @@ html[data-theme="dark"] .shot { box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) in
 <main id="top">
   <section class="hero wrap">
     <div class="hero-copy">
-      <div class="eyebrow"><span class="pulse"></span>Pure Swift · iOS 13+</div>
+      <div class="eyebrow"><span class="pulse"></span><span data-i18n="hero.eyebrow">Pure Swift · iOS 13+</span></div>
       <h1>DoSwift<span class="accent">.</span></h1>
-      <p class="lead">A debug overlay for iOS that stays out of the way — until you need it. Inspect and edit live views, capture traffic, watch performance, all from one floating button.</p>
+      <p class="lead" data-i18n="hero.lead">A debug overlay for iOS that stays out of the way — until you need it. Inspect and edit live views, capture traffic, watch performance, all from one floating button.</p>
       <div class="chips">
-        <span class="chip"><svg><use href="#i-check"/></svg>Zero dependencies</span>
-        <span class="chip"><svg><use href="#i-moon"/></svg>Dark mode</span>
+        <span class="chip"><svg><use href="#i-check"/></svg><span data-i18n="hero.zero">Zero dependencies</span></span>
+        <span class="chip"><svg><use href="#i-moon"/></svg><span data-i18n="hero.dark">Dark mode</span></span>
         <span class="chip"><svg><use href="#i-check"/></svg>EN / 中文</span>
         <span class="chip"><svg><use href="#i-check"/></svg>UIKit</span>
       </div>
       <div class="actions">
         <a class="btn btn-primary" href="https://github.com/darkThanBlack/DoSwiftKit" target="_blank" rel="noreferrer">
-          View on GitHub <svg><use href="#i-arrow-ur"/></svg>
+          <span data-i18n="hero.github">View on GitHub</span> <svg><use href="#i-arrow-ur"/></svg>
         </a>
-        <a class="btn btn-ghost" href="#screens">Explore the tools</a>
+        <a class="btn btn-ghost" href="#screens" data-i18n="hero.explore">Explore the tools</a>
       </div>
     </div>
 
@@ -1366,21 +1414,21 @@ html[data-theme="dark"] .shot { box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) in
               <button class="menu-close" id="menuClose" type="button" aria-label="Close menu"><svg><use href="#i-x"/></svg></button>
             </div>
             <div class="menu-scroll">
-              <div class="menu-group">Info</div>
+              <div class="menu-group" data-i18n="menu.info">Info</div>
               <div class="menu-grid">
-                <button class="menu-tile" type="button" data-target="shot-appinfo"><svg><use href="#i-info"/></svg><span>App Info</span></button>
-                <button class="menu-tile" type="button" data-target="shot-console"><svg><use href="#i-console"/></svg><span>Console</span></button>
-                <button class="menu-tile" type="button" data-target="shot-network"><svg><use href="#i-network"/></svg><span>Network</span></button>
-                <button class="menu-tile" type="button" data-target="shot-userdefaults"><svg><use href="#i-grid"/></svg><span>UserDefaults</span></button>
-                <button class="menu-tile" type="button" data-target="shot-sandbox"><svg><use href="#i-folder"/></svg><span>Sandbox</span></button>
+                <button class="menu-tile" type="button" data-target="shot-appinfo"><svg><use href="#i-info"/></svg><span data-i18n="appinfo.title">App Info</span></button>
+                <button class="menu-tile" type="button" data-target="shot-console"><svg><use href="#i-console"/></svg><span data-i18n="console.title">Console</span></button>
+                <button class="menu-tile" type="button" data-target="shot-network"><svg><use href="#i-network"/></svg><span data-i18n="network.title">Network</span></button>
+                <button class="menu-tile" type="button" data-target="shot-userdefaults"><svg><use href="#i-grid"/></svg><span data-i18n="userdefaults.title">UserDefaults</span></button>
+                <button class="menu-tile" type="button" data-target="shot-sandbox"><svg><use href="#i-folder"/></svg><span data-i18n="sandbox.title">Sandbox</span></button>
               </div>
-              <div class="menu-group">Visual</div>
+              <div class="menu-group" data-i18n="menu.visual">Visual</div>
               <div class="menu-grid">
-                <button class="menu-tile" type="button" data-target="shot-hierarchy"><svg><use href="#i-viewfinder"/></svg><span>UI Hierarchy</span></button>
+                <button class="menu-tile" type="button" data-target="shot-hierarchy"><svg><use href="#i-viewfinder"/></svg><span data-i18n="hierarchy.title">UI Hierarchy</span></button>
               </div>
-              <div class="menu-group">Performance</div>
+              <div class="menu-group" data-i18n="menu.performance">Performance</div>
               <div class="menu-grid">
-                <button class="menu-tile" type="button" data-target="shot-perf"><svg><use href="#i-gauge"/></svg><span>Performance</span></button>
+                <button class="menu-tile" type="button" data-target="shot-perf"><svg><use href="#i-gauge"/></svg><span data-i18n="perf.title">Performance</span></button>
               </div>
             </div>
           </div>
@@ -1391,358 +1439,19 @@ html[data-theme="dark"] .shot { box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) in
 
   <section class="tools-section wrap" id="screens">
     <div class="section-head reveal">
-      <div class="eyebrow"><span class="pulse"></span>Seven tools · one button</div>
-      <h2 class="section-title">Everything you need, already on screen.</h2>
-      <p class="section-sub">The real UI, rebuilt in HTML. Tap a row, drag the crosshair, search a log — this page is the prototype.</p>
+      <div class="eyebrow"><span class="pulse"></span><span data-i18n="section.eyebrow">Seven tools · one button</span></div>
+      <h2 class="section-title" data-i18n="section.title">Everything you need, already on screen.</h2>
+      <p class="section-sub" data-i18n="section.sub">Live view inspection, network capture, console, performance, UserDefaults and sandbox — the whole debug toolkit runs inside your app. No cable, no rebuild.</p>
     </div>
 
     <div class="grid">
-
-      <!-- App Info -->
-      <figure class="shot reveal" id="shot-appinfo" data-tool="appinfo">
-        <header class="shot-head">
-          <span class="shot-icon"><svg><use href="#i-info"/></svg></span>
-          <div class="shot-meta"><h3>App Info</h3><p>Device, build, permissions</p></div>
-          <span class="shot-hint">Tap a row to copy</span>
-        </header>
-        <div class="device">
-          <div class="device__screen" data-bg="grouped">
-            <div class="tool grouped">
-              <div class="navbar">
-                <button class="nav-btn" type="button" aria-label="Close"><svg><use href="#i-x"/></svg></button>
-                <span class="nav-title">App Info</span>
-                <button class="nav-btn nav-btn--text" type="button">Copy JSON</button>
-              </div>
-              <div class="scroll grouped">
-                <p class="sec-title">Device</p>
-                <div class="card">
-                  <button class="row row--tap row--copy" type="button" data-copy="iPhone 17 Pro (iPhone18,1)">
-                    <span class="row-text"><span class="row-title">Model</span><span class="row-detail">iPhone 17 Pro (iPhone18,1)</span></span>
-                  </button>
-                  <button class="row row--tap row--copy" type="button" data-copy="26.1 (23B85)">
-                    <span class="row-text"><span class="row-title">System Version</span><span class="row-detail">26.1 (23B85)</span></span>
-                  </button>
-                  <button class="row row--tap row--copy" type="button" data-copy="402×874 pt · 1206×2622 px · 120Hz">
-                    <span class="row-text"><span class="row-title">Screen</span><span class="row-detail">402×874 pt · 1206×2622 px · 120Hz</span></span>
-                  </button>
-                  <button class="row row--tap row--copy" type="button" data-copy="192.168.1.24">
-                    <span class="row-text"><span class="row-title">IPv4</span><span class="row-detail">192.168.1.24</span></span>
-                  </button>
-                </div>
-
-                <p class="sec-title">Application</p>
-                <div class="card">
-                  <button class="row row--tap row--copy" type="button" data-copy="com.darkthanblack.atlas">
-                    <span class="row-text"><span class="row-title">Bundle ID</span><span class="row-detail">com.darkthanblack.atlas</span></span>
-                  </button>
-                  <button class="row row--tap row--copy" type="button" data-copy="3.4.0">
-                    <span class="row-text"><span class="row-title">Version</span><span class="row-detail">3.4.0</span></span>
-                  </button>
-                  <button class="row row--tap row--copy" type="button" data-copy="812">
-                    <span class="row-text"><span class="row-title">Build</span><span class="row-detail">812</span></span>
-                  </button>
-                  <button class="row row--tap row--copy" type="button" data-copy="Development / Enterprise">
-                    <span class="row-text"><span class="row-title">Distribution</span><span class="row-detail">Development / Enterprise</span></span>
-                  </button>
-                  <button class="row row--tap row--copy" type="button" data-copy="Simulator">
-                    <span class="row-text"><span class="row-title">Runtime Form</span><span class="row-detail">Simulator</span></span>
-                  </button>
-                </div>
-
-                <p class="sec-title">Permissions</p>
-                <div class="card">
-                  <button class="row row--tap row--copy" type="button" data-copy="While Using">
-                    <span class="row-text"><span class="row-title">Location</span><span class="row-detail">While Using</span></span>
-                  </button>
-                  <button class="row row--tap row--copy" type="button" data-copy="Authorized">
-                    <span class="row-text"><span class="row-title">Notifications</span><span class="row-detail">Authorized</span></span>
-                  </button>
-                  <button class="row row--tap row--copy" type="button" data-copy="Authorized">
-                    <span class="row-text"><span class="row-title">Camera</span><span class="row-detail">Authorized</span></span>
-                  </button>
-                  <button class="row row--tap row--copy" type="button" data-copy="Not Determined">
-                    <span class="row-text"><span class="row-title">Microphone</span><span class="row-detail">Not Determined</span></span>
-                  </button>
-                  <button class="row row--tap row--copy" type="button" data-copy="Limited">
-                    <span class="row-text"><span class="row-title">Photos</span><span class="row-detail">Limited</span></span>
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </figure>
-
-      <!-- Console -->
-      <figure class="shot reveal" id="shot-console" data-tool="console">
-        <header class="shot-head">
-          <span class="shot-icon"><svg><use href="#i-console"/></svg></span>
-          <div class="shot-meta"><h3>Console</h3><p>stdout · stderr · os_log</p></div>
-          <span class="shot-hint">Search the log</span>
-        </header>
-        <div class="device">
-          <div class="device__screen">
-            <div class="tool">
-              <div class="navbar">
-                <button class="nav-btn" type="button" aria-label="Close"><svg><use href="#i-x"/></svg></button>
-                <span class="nav-title">Console</span>
-                <button class="nav-btn" type="button" aria-label="Settings"><svg><use href="#i-gear"/></svg></button>
-              </div>
-              <div class="console-search">
-                <div class="searchbar">
-                  <svg><use href="#i-search"/></svg>
-                  <input id="consoleSearch" type="search" placeholder="Search lines" autocomplete="off" spellcheck="false">
-                </div>
-              </div>
-              <div class="log-list" id="consoleList"></div>
-              <div class="toolbar">
-                <button class="toolbar-btn is-red" id="consoleCapture" type="button" aria-label="Stop capture"><svg><use href="#i-stop"/></svg></button>
-                <button class="toolbar-btn" type="button" aria-label="Read unified log"><svg><use href="#i-refresh"/></svg></button>
-                <button class="toolbar-btn" id="consolePause" type="button" aria-label="Pause"><svg><use href="#i-pause"/></svg></button>
-                <button class="toolbar-btn" type="button" aria-label="Clear"><svg><use href="#i-trash"/></svg></button>
-                <button class="toolbar-btn" type="button" aria-label="Export"><svg><use href="#i-share"/></svg></button>
-              </div>
-              <div class="statusline" id="consoleStatus">total 248   fd1 132   fd2 9   oslog 107  ·  read in 0.8s</div>
-            </div>
-          </div>
-        </div>
-      </figure>
-
-      <!-- Network -->
-      <figure class="shot reveal" id="shot-network" data-tool="network">
-        <header class="shot-head">
-          <span class="shot-icon"><svg><use href="#i-network"/></svg></span>
-          <div class="shot-meta"><h3>Network</h3><p>URLSession capture</p></div>
-          <span class="shot-hint">Tap a request</span>
-        </header>
-        <div class="device">
-          <div class="device__screen" data-bg="grouped">
-            <div class="tool grouped" id="netTool">
-              <div class="view net-main" id="netMain">
-                <div class="navbar">
-                  <button class="nav-btn" type="button" aria-label="Close"><svg><use href="#i-x"/></svg></button>
-                  <span class="nav-title">Network</span>
-                  <button class="nav-btn nav-btn--text" type="button">Clear</button>
-                </div>
-                <div class="scroll grouped">
-                  <div class="card action-card">
-                    <button class="action-row destructive" id="netCapture" type="button">Stop Capture</button>
-                  </div>
-                  <p class="sec-title" id="netSectionTitle">Requests (24)</p>
-                  <div class="card" id="netRows"></div>
-                  <p class="footer-note" id="netEmpty" hidden>No requests captured. Only URLSession is covered — WKWebView, WebSocket and raw sockets are not.</p>
-                </div>
-              </div>
-
-              <div class="view is-pushed" id="netDetail">
-                <div class="navbar">
-                  <button class="nav-btn nav-back" id="netDetailBack" type="button"><svg><use href="#i-chev-l"/></svg>Network</button>
-                  <span class="nav-title" id="netDetailTitle">api.example.com</span>
-                  <span></span>
-                </div>
-                <div class="scroll grouped" id="netDetailBody"></div>
-              </div>
-
-              <div class="view is-pushed" id="netPlain">
-                <div class="navbar">
-                  <button class="nav-btn nav-back" id="netPlainBack" type="button"><svg><use href="#i-chev-l"/></svg>Detail</button>
-                  <span class="nav-title" id="netPlainTitle">Response Body</span>
-                  <span></span>
-                </div>
-                <pre class="preview-body" id="netPlainText"></pre>
-              </div>
-            </div>
-          </div>
-        </div>
-      </figure>
-
-      <!-- UserDefaults -->
-      <figure class="shot reveal" id="shot-userdefaults" data-tool="userdefaults">
-        <header class="shot-head">
-          <span class="shot-icon"><svg><use href="#i-grid"/></svg></span>
-          <div class="shot-meta"><h3>UserDefaults</h3><p>Browse, search, clean up</p></div>
-          <span class="shot-hint">Search the keys</span>
-        </header>
-        <div class="device">
-          <div class="device__screen" data-bg="grouped">
-            <div class="tool grouped" id="udTool">
-              <div class="view" id="udMain">
-                <div class="navbar">
-                  <button class="nav-btn" type="button" aria-label="Close"><svg><use href="#i-x"/></svg></button>
-                  <span class="nav-title">UserDefaults</span>
-                  <button class="nav-btn nav-btn--text" type="button">Edit</button>
-                </div>
-                <div class="searchrow">
-                  <div class="searchbar">
-                    <svg><use href="#i-search"/></svg>
-                    <input id="udSearch" type="search" placeholder="Search by key" autocomplete="off" spellcheck="false">
-                  </div>
-                </div>
-                <div class="scroll grouped" id="udScroll">
-                  <div id="udList"></div>
-                  <div class="empty-state" id="udEmpty" hidden>No keys match that search.</div>
-                </div>
-              </div>
-              <div class="view is-pushed" id="udPlain">
-                <div class="navbar">
-                  <button class="nav-btn nav-back" id="udPlainBack" type="button"><svg><use href="#i-chev-l"/></svg>UserDefaults</button>
-                  <span class="nav-title" id="udPlainTitle">Key</span>
-                  <span></span>
-                </div>
-                <pre class="preview-body" id="udPlainText"></pre>
-              </div>
-            </div>
-          </div>
-        </div>
-      </figure>
-
-      <!-- Sandbox -->
-      <figure class="shot reveal" id="shot-sandbox" data-tool="sandbox">
-        <header class="shot-head">
-          <span class="shot-icon"><svg><use href="#i-folder"/></svg></span>
-          <div class="shot-meta"><h3>Sandbox</h3><p>Files, previews, SQLite</p></div>
-          <span class="shot-hint">Open a folder</span>
-        </header>
-        <div class="device">
-          <div class="device__screen">
-            <div class="tool" id="sandboxTool">
-              <div class="view" id="sbMain">
-                <div class="navbar">
-                  <button class="nav-btn" type="button" aria-label="Close"><svg><use href="#i-x"/></svg></button>
-                  <span class="nav-title">Sandbox</span>
-                  <span></span>
-                </div>
-                <div class="pathbar" id="sbPath"></div>
-                <div class="file-list" id="sbList"></div>
-              </div>
-              <div class="view is-pushed" id="sbPreview">
-                <div class="navbar">
-                  <button class="nav-btn nav-back" id="sbPreviewBack" type="button"><svg><use href="#i-chev-l"/></svg>Sandbox</button>
-                  <span class="nav-title" id="sbPreviewTitle">Preview</span>
-                  <span></span>
-                </div>
-                <pre class="preview-body" id="sbPreviewText"></pre>
-              </div>
-
-              <div class="sheet-backdrop" id="sbBackdrop"></div>
-              <div class="sheet-panel" id="sbSheet">
-                <div class="sheet-card">
-                  <div class="sheet-title" id="sbSheetTitle">File</div>
-                  <button class="sheet-btn" id="sbPreviewBtn" type="button">Preview</button>
-                  <button class="sheet-btn" id="sbShareBtn" type="button">Share</button>
-                  <button class="sheet-btn" id="sbCopyBtn" type="button">Copy Path</button>
-                </div>
-                <div class="sheet-card">
-                  <button class="sheet-btn sheet-cancel" id="sbCancelBtn" type="button">Cancel</button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </figure>
-
-      <!-- Performance -->
-      <figure class="shot reveal" id="shot-perf" data-tool="perf">
-        <header class="shot-head">
-          <span class="shot-icon"><svg><use href="#i-gauge"/></svg></span>
-          <div class="shot-meta"><h3>Performance</h3><p>FPS · CPU · Memory</p></div>
-          <span class="shot-hint">Tap to cycle · long-press for report</span>
-        </header>
-        <div class="device">
-          <div class="device__screen" id="perfScreen">
-            <div class="tool" id="perfTool">
-              <div class="host perf-host" id="perfHost"></div>
-              <div class="perf-float" id="perfFloat" role="button" tabindex="0" aria-label="Performance overlay">
-                <div class="perf-head">
-                  <span class="perf-name" id="perfName">FPS</span>
-                  <span class="perf-num"><b id="perfValue">60</b><i id="perfUnit">fps</i></span>
-                </div>
-                <svg class="spark" viewBox="0 0 100 22" preserveAspectRatio="none" aria-hidden="true">
-                  <path class="spark-fill" id="perfFill" d="M0 22 L0 10 L100 10 L100 22 Z"></path>
-                  <path class="spark-line" id="perfLine" d="M0 10 L100 10"></path>
-                </svg>
-              </div>
-
-              <div class="perf-report" id="perfReport">
-                <div class="navbar">
-                  <button class="nav-btn" id="perfReportClose" type="button" aria-label="Close report"><svg><use href="#i-x"/></svg></button>
-                  <span class="nav-title">Performance</span>
-                  <button class="nav-btn" type="button" aria-label="Settings"><svg><use href="#i-gear"/></svg></button>
-                </div>
-                <div class="scroll grouped">
-                  <p class="sec-title">Overview</p>
-                  <div class="timeline-card">
-                    <div class="timeline">
-                      <div class="lane">
-                        <span class="lane-label">FPS</span><span class="lane-max">60 fps</span>
-                        <svg viewBox="0 0 300 34" preserveAspectRatio="none" aria-hidden="true">
-                          <path class="spark-fill" style="fill:#0a84ff" d="M0 34 L0 22 L12 20 L24 24 L36 19 L48 21 L60 18 L72 20 L84 17 L96 19 L108 16 L120 18 L132 15 L144 17 L156 14 L168 16 L180 13 L192 15 L204 12 L216 14 L228 11 L240 13 L252 10 L264 12 L276 9 L288 11 L300 8 L300 34 Z"></path>
-                          <path class="spark-line" style="stroke:#0a84ff" d="M0 22 L12 20 L24 24 L36 19 L48 21 L60 18 L72 20 L84 17 L96 19 L108 16 L120 18 L132 15 L144 17 L156 14 L168 16 L180 13 L192 15 L204 12 L216 14 L228 11 L240 13 L252 10 L264 12 L276 9 L288 11 L300 8"></path>
-                          <path class="lane-base" d="M0 33.5H300"></path>
-                        </svg>
-                      </div>
-                      <div class="lane">
-                        <span class="lane-label">CPU</span><span class="lane-max">100 %</span>
-                        <svg viewBox="0 0 300 34" preserveAspectRatio="none" aria-hidden="true">
-                          <path class="spark-fill" style="fill:#ff9500" d="M0 34 L0 24 L20 22 L40 25 L60 21 L80 24 L100 19 L120 23 L140 26 L160 21 L180 24 L200 20 L220 23 L240 18 L260 22 L280 25 L300 21 L300 34 Z"></path>
-                          <path class="spark-line" style="stroke:#ff9500" d="M0 24 L20 22 L40 25 L60 21 L80 24 L100 19 L120 23 L140 26 L160 21 L180 24 L200 20 L220 23 L240 18 L260 22 L280 25 L300 21"></path>
-                          <path class="lane-base" d="M0 33.5H300"></path>
-                        </svg>
-                      </div>
-                      <div class="lane">
-                        <span class="lane-label">Memory</span><span class="lane-max">512 MB</span>
-                        <svg viewBox="0 0 300 34" preserveAspectRatio="none" aria-hidden="true">
-                          <path class="spark-fill" style="fill:#34c759" d="M0 34 L0 18 L30 17 L60 19 L90 16 L120 18 L150 15 L180 17 L210 14 L240 16 L270 13 L300 15 L300 34 Z"></path>
-                          <path class="spark-line" style="stroke:#34c759" d="M0 18 L30 17 L60 19 L90 16 L120 18 L150 15 L180 17 L210 14 L240 16 L270 13 L300 15"></path>
-                          <path class="lane-base" d="M0 33.5H300"></path>
-                        </svg>
-                      </div>
-                    </div>
-                    <div class="timeline-times"><span>10:23:41</span><span>10:24:11</span><span>10:24:41</span></div>
-                  </div>
-                  <div class="scope-card">
-                    <span class="scope-range">10:23:41 – 10:24:41</span>
-                    <span class="scope-all">All</span>
-                  </div>
-
-                  <p class="sec-title">Memory</p>
-                  <div class="card">
-                    <div class="row"><span class="row-text"><span class="row-title">Total</span></span><span class="row-value">512 MB</span></div>
-                    <div class="row"><span class="row-text"><span class="row-title">Average</span></span><span class="row-value">184 MB · 36%</span></div>
-                    <div class="row"><span class="row-text"><span class="row-title">Peak</span></span><span class="row-value">231 MB · 45%</span></div>
-                    <div class="row"><span class="row-text"><span class="row-title">Graphics</span></span><span class="row-value">68 MB · 13%</span></div>
-                    <div class="row"><span class="row-text"><span class="row-title">Media</span></span><span class="row-value">42 MB · 8%</span></div>
-                    <div class="row"><span class="row-text"><span class="row-title">Network</span></span><span class="row-value">12 MB · 2%</span></div>
-                    <div class="row"><span class="row-text"><span class="row-title">Other</span></span><span class="row-value">62 MB · 12%</span></div>
-                  </div>
-
-                  <p class="sec-title">CPU</p>
-                  <div class="card">
-                    <div class="row"><span class="row-text"><span class="row-title">Average Usage</span></span><span class="row-value">23%</span></div>
-                    <div class="row"><span class="row-text"><span class="row-title">Peak</span></span><span class="row-value">47%</span></div>
-                    <div class="row"><span class="row-text"><span class="row-title">Total CPU Time</span></span><span class="row-value">18 s</span></div>
-                  </div>
-
-                  <p class="sec-title">FPS</p>
-                  <div class="card">
-                    <div class="row"><span class="row-text"><span class="row-title">Average FPS</span></span><span class="row-value">59 fps</span></div>
-                    <div class="row"><span class="row-text"><span class="row-title">Slow Frames</span></span><span class="row-value">3</span></div>
-                    <div class="row"><span class="row-text"><span class="row-title">Frozen Frames</span></span><span class="row-value">0</span></div>
-                    <div class="row"><span class="row-text"><span class="row-title">Total Frames</span></span><span class="row-value">3582</span></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </figure>
 
       <!-- UI Hierarchy -->
       <figure class="shot shot--wide reveal" id="shot-hierarchy" data-tool="hierarchy">
         <header class="shot-head">
           <span class="shot-icon"><svg><use href="#i-viewfinder"/></svg></span>
-          <div class="shot-meta"><h3>UI Hierarchy</h3><p>Pick, measure, edit — live</p></div>
-          <span class="shot-hint">Drag the crosshair · Tree / Detail drive the right screen</span>
+          <div class="shot-meta"><h3 data-i18n="hierarchy.title">UI Hierarchy</h3><p data-i18n="shot.hierarchy.sub">Pick, measure, edit — live</p></div>
+          <span class="shot-hint" data-i18n="shot.hierarchy.hint">Picker · ruler · live edits</span>
         </header>
         <div class="duo">
 
@@ -1793,23 +1502,23 @@ html[data-theme="dark"] .shot { box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) in
 
                 <div class="hs-info" id="hsInfo">
                   <div class="hs-info-head">
-                    <h4>Current focus</h4>
+                    <h4 data-i18n="hs.info_title">Current focus</h4>
                     <svg><use href="#i-gear"/></svg>
                     <svg><use href="#i-x"/></svg>
                   </div>
-                  <div class="hs-row"><span class="hs-key">Position:</span><span class="hs-val" id="hsPos">L 14.0  R 14.0  T 190.0  B 230.0</span></div>
-                  <div class="hs-row"><span class="hs-key">Name:</span><span class="hs-val" id="hsName">UIView</span></div>
-                  <div class="hs-row"><span class="hs-key">Pixel:</span><span class="hs-val is-color"><i class="hs-swatch" id="hsSwatch"></i><span id="hsPixel">#E58852</span></span></div>
-                  <div class="hs-row"><span class="hs-key">Frame:</span><span class="hs-val" id="hsFrame">x 14.0, y 190.0, w 362.0, h 236.0</span></div>
-                  <div class="hs-row"><span class="hs-key">Background:</span><span class="hs-val" id="hsBg">#FFFFFF</span></div>
-                  <div class="hs-row"><span class="hs-key">Text Color:</span><span class="hs-val" id="hsText">#1C1C1E</span></div>
-                  <div class="hs-row"><span class="hs-key">Font:</span><span class="hs-val" id="hsFont">SF Pro Text 15</span></div>
-                  <div class="hs-row"><span class="hs-key">Tag:</span><span class="hs-val" id="hsTag">0</span></div>
+                  <div class="hs-row"><span class="hs-key" data-i18n="hs.key.position">Position:</span><span class="hs-val" id="hsPos">L 14.0  R 14.0  T 190.0  B 230.0</span></div>
+                  <div class="hs-row"><span class="hs-key" data-i18n="hs.key.name">Name:</span><span class="hs-val" id="hsName">UIView</span></div>
+                  <div class="hs-row"><span class="hs-key" data-i18n="hs.key.pixel">Pixel:</span><span class="hs-val is-color"><i class="hs-swatch" id="hsSwatch"></i><span id="hsPixel">#E58852</span></span></div>
+                  <div class="hs-row"><span class="hs-key" data-i18n="hs.key.frame">Frame:</span><span class="hs-val" id="hsFrame">x 14.0, y 190.0, w 362.0, h 236.0</span></div>
+                  <div class="hs-row"><span class="hs-key" data-i18n="hs.key.background">Background:</span><span class="hs-val" id="hsBg">#FFFFFF</span></div>
+                  <div class="hs-row"><span class="hs-key" data-i18n="hs.key.text_color">Text Color:</span><span class="hs-val" id="hsText">#1C1C1E</span></div>
+                  <div class="hs-row"><span class="hs-key" data-i18n="hs.key.font">Font:</span><span class="hs-val" id="hsFont">SF Pro Text 15</span></div>
+                  <div class="hs-row"><span class="hs-key" data-i18n="hs.key.tag">Tag:</span><span class="hs-val" id="hsTag">0</span></div>
                   <div class="hs-actions">
-                    <button class="hs-action" type="button" data-hs-action="tree"><svg><use href="#i-tree"/></svg>Tree</button>
-                    <button class="hs-action" type="button" data-hs-action="parents"><svg><use href="#i-up"/></svg>Parents</button>
-                    <button class="hs-action" type="button" data-hs-action="children"><svg><use href="#i-down"/></svg>Children</button>
-                    <button class="hs-action is-strong" type="button" data-hs-action="detail"><svg><use href="#i-info"/></svg>Detail</button>
+                    <button class="hs-action" type="button" data-hs-action="tree"><svg><use href="#i-tree"/></svg><span data-i18n="hs.action.tree">Tree</span></button>
+                    <button class="hs-action" type="button" data-hs-action="parents"><svg><use href="#i-up"/></svg><span data-i18n="hs.action.parents">Parents</span></button>
+                    <button class="hs-action" type="button" data-hs-action="children"><svg><use href="#i-down"/></svg><span data-i18n="hs.action.children">Children</span></button>
+                    <button class="hs-action is-strong" type="button" data-hs-action="detail"><svg><use href="#i-info"/></svg><span data-i18n="hs.action.detail">Detail</span></button>
                   </div>
                 </div>
               </div>
@@ -1824,9 +1533,9 @@ html[data-theme="dark"] .shot { box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) in
                   <div class="navbar">
                     <button class="nav-btn" type="button" aria-label="Close"><svg><use href="#i-x"/></svg></button>
                     <div class="segmented" id="hsSegments" role="tablist" aria-label="Detail sections">
-                      <button class="seg is-active" type="button" data-seg="properties" role="tab">Properties</button>
-                      <button class="seg" type="button" data-seg="layer" role="tab">Layer</button>
-                      <button class="seg" type="button" data-seg="layout" role="tab">Layout</button>
+                      <button class="seg is-active" type="button" data-seg="properties" role="tab" data-i18n="hs.seg.properties">Properties</button>
+                      <button class="seg" type="button" data-seg="layer" role="tab" data-i18n="hs.seg.layer">Layer</button>
+                      <button class="seg" type="button" data-seg="layout" role="tab" data-i18n="hs.seg.layout">Layout</button>
                     </div>
                     <span></span>
                   </div>
@@ -1840,7 +1549,7 @@ html[data-theme="dark"] .shot { box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) in
                 <div class="view tree-tool is-pushed" id="hsTree">
                   <div class="navbar">
                     <button class="nav-btn" type="button" aria-label="Close"><svg><use href="#i-x"/></svg></button>
-                    <span class="nav-title">View Tree</span>
+                    <span class="nav-title" data-i18n="hs.tree_title">View Tree</span>
                     <span></span>
                   </div>
                   <div class="tree-path" id="hsTreePath"></div>
@@ -1853,31 +1562,396 @@ html[data-theme="dark"] .shot { box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) in
         </div>
       </figure>
 
+      <!-- App Info -->
+      <figure class="shot reveal" id="shot-appinfo" data-tool="appinfo">
+        <header class="shot-head">
+          <span class="shot-icon"><svg><use href="#i-info"/></svg></span>
+          <div class="shot-meta"><h3 data-i18n="appinfo.title">App Info</h3><p data-i18n="shot.appinfo.sub">Device, build, permissions</p></div>
+          <span class="shot-hint" data-i18n="shot.appinfo.hint">Tap-to-copy values</span>
+        </header>
+        <div class="device">
+          <div class="device__screen" data-bg="grouped">
+            <div class="tool tool--grouped">
+              <div class="navbar">
+                <button class="nav-btn" type="button" aria-label="Close"><svg><use href="#i-x"/></svg></button>
+                <span class="nav-title" data-i18n="appinfo.title">App Info</span>
+                <button class="nav-btn nav-btn--text" type="button" data-i18n="appinfo.copy">Copy JSON</button>
+              </div>
+              <div class="scroll grouped">
+                <p class="sec-title" data-i18n="appinfo.device">Device</p>
+                <div class="card">
+                  <button class="row row--tap row--copy" type="button" data-copy="iPhone 17 Pro (iPhone18,1)">
+                    <span class="row-text"><span class="row-title" data-i18n="appinfo.model">Model</span><span class="row-detail">iPhone 17 Pro (iPhone18,1)</span></span>
+                  </button>
+                  <button class="row row--tap row--copy" type="button" data-copy="26.1 (23B85)">
+                    <span class="row-text"><span class="row-title" data-i18n="appinfo.system">System Version</span><span class="row-detail">26.1 (23B85)</span></span>
+                  </button>
+                  <button class="row row--tap row--copy" type="button" data-copy="402×874 pt · 1206×2622 px · 120Hz">
+                    <span class="row-text"><span class="row-title" data-i18n="appinfo.screen">Screen</span><span class="row-detail">402×874 pt · 1206×2622 px · 120Hz</span></span>
+                  </button>
+                  <button class="row row--tap row--copy" type="button" data-copy="192.168.1.24">
+                    <span class="row-text"><span class="row-title">IPv4</span><span class="row-detail">192.168.1.24</span></span>
+                  </button>
+                </div>
+
+                <p class="sec-title" data-i18n="appinfo.application">Application</p>
+                <div class="card">
+                  <button class="row row--tap row--copy" type="button" data-copy="com.darkthanblack.atlas">
+                    <span class="row-text"><span class="row-title">Bundle ID</span><span class="row-detail">com.darkthanblack.atlas</span></span>
+                  </button>
+                  <button class="row row--tap row--copy" type="button" data-copy="3.4.0">
+                    <span class="row-text"><span class="row-title" data-i18n="appinfo.version">Version</span><span class="row-detail">3.4.0</span></span>
+                  </button>
+                  <button class="row row--tap row--copy" type="button" data-copy="812">
+                    <span class="row-text"><span class="row-title" data-i18n="appinfo.build">Build</span><span class="row-detail">812</span></span>
+                  </button>
+                  <button class="row row--tap row--copy" type="button" data-copy="Development / Enterprise">
+                    <span class="row-text"><span class="row-title" data-i18n="appinfo.distribution">Distribution</span><span class="row-detail" data-i18n="appinfo.dev_enterprise">Development / Enterprise</span></span>
+                  </button>
+                  <button class="row row--tap row--copy" type="button" data-copy="Simulator">
+                    <span class="row-text"><span class="row-title" data-i18n="appinfo.runtime">Runtime Form</span><span class="row-detail" data-i18n="appinfo.simulator">Simulator</span></span>
+                  </button>
+                </div>
+
+                <p class="sec-title" data-i18n="appinfo.permissions">Permissions</p>
+                <div class="card">
+                  <button class="row row--tap row--copy" type="button" data-copy="While Using">
+                    <span class="row-text"><span class="row-title" data-i18n="appinfo.location">Location</span><span class="row-detail" data-i18n="appinfo.while_using">While Using</span></span>
+                  </button>
+                  <button class="row row--tap row--copy" type="button" data-copy="Authorized">
+                    <span class="row-text"><span class="row-title" data-i18n="appinfo.notifications">Notifications</span><span class="row-detail" data-i18n="appinfo.authorized">Authorized</span></span>
+                  </button>
+                  <button class="row row--tap row--copy" type="button" data-copy="Authorized">
+                    <span class="row-text"><span class="row-title" data-i18n="appinfo.camera">Camera</span><span class="row-detail" data-i18n="appinfo.authorized">Authorized</span></span>
+                  </button>
+                  <button class="row row--tap row--copy" type="button" data-copy="Not Determined">
+                    <span class="row-text"><span class="row-title" data-i18n="appinfo.microphone">Microphone</span><span class="row-detail" data-i18n="appinfo.not_determined">Not Determined</span></span>
+                  </button>
+                  <button class="row row--tap row--copy" type="button" data-copy="Limited">
+                    <span class="row-text"><span class="row-title" data-i18n="appinfo.photos">Photos</span><span class="row-detail" data-i18n="appinfo.limited">Limited</span></span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </figure>
+
+      <!-- Console -->
+      <figure class="shot reveal" id="shot-console" data-tool="console">
+        <header class="shot-head">
+          <span class="shot-icon"><svg><use href="#i-console"/></svg></span>
+          <div class="shot-meta"><h3 data-i18n="console.title">Console</h3><p data-i18n="shot.console.sub">stdout · stderr · os_log</p></div>
+          <span class="shot-hint" data-i18n="shot.console.hint">Search · pause · capture</span>
+        </header>
+        <div class="device">
+          <div class="device__screen">
+            <div class="tool">
+              <div class="navbar">
+                <button class="nav-btn" type="button" aria-label="Close"><svg><use href="#i-x"/></svg></button>
+                <span class="nav-title" data-i18n="console.title">Console</span>
+                <button class="nav-btn" type="button" aria-label="Settings"><svg><use href="#i-gear"/></svg></button>
+              </div>
+              <div class="console-search">
+                <div class="searchbar">
+                  <svg><use href="#i-search"/></svg>
+                  <input id="consoleSearch" type="search" placeholder="Search lines" data-i18n-placeholder="console.search" autocomplete="off" spellcheck="false">
+                </div>
+              </div>
+              <div class="log-list" id="consoleList"></div>
+              <div class="toolbar">
+                <button class="toolbar-btn is-red" id="consoleCapture" type="button" aria-label="Stop capture"><svg><use href="#i-stop"/></svg></button>
+                <button class="toolbar-btn" type="button" aria-label="Read unified log"><svg><use href="#i-refresh"/></svg></button>
+                <button class="toolbar-btn" id="consolePause" type="button" aria-label="Pause"><svg><use href="#i-pause"/></svg></button>
+                <button class="toolbar-btn" type="button" aria-label="Clear"><svg><use href="#i-trash"/></svg></button>
+                <button class="toolbar-btn" type="button" aria-label="Export"><svg><use href="#i-share"/></svg></button>
+              </div>
+              <div class="statusline" id="consoleStatus" data-i18n="console.status.initial">total 248   fd1 132   fd2 9   oslog 107  ·  read in 0.8s</div>
+            </div>
+          </div>
+        </div>
+      </figure>
+
+      <!-- Network -->
+      <figure class="shot reveal" id="shot-network" data-tool="network">
+        <header class="shot-head">
+          <span class="shot-icon"><svg><use href="#i-network"/></svg></span>
+          <div class="shot-meta"><h3 data-i18n="network.title">Network</h3><p data-i18n="shot.network.sub">URLSession capture</p></div>
+          <span class="shot-hint" data-i18n="shot.network.hint">Requests → responses</span>
+        </header>
+        <div class="device">
+          <div class="device__screen" data-bg="grouped">
+            <div class="tool tool--grouped" id="netTool">
+              <div class="view net-main" id="netMain">
+                <div class="navbar">
+                  <button class="nav-btn" type="button" aria-label="Close"><svg><use href="#i-x"/></svg></button>
+                  <span class="nav-title" data-i18n="network.title">Network</span>
+                  <button class="nav-btn nav-btn--text" type="button" data-i18n="common.clear">Clear</button>
+                </div>
+                <div class="scroll grouped">
+                  <div class="card action-card">
+                    <button class="action-row destructive" id="netCapture" type="button" data-i18n="common.stop_capture">Stop Capture</button>
+                  </div>
+                  <p class="sec-title" id="netSectionTitle">Requests (24)</p>
+                  <div class="card" id="netRows"></div>
+                  <p class="footer-note" id="netEmpty" hidden data-i18n="network.empty">No requests captured. Only URLSession is covered — WKWebView, WebSocket and raw sockets are not.</p>
+                </div>
+              </div>
+
+              <div class="view is-pushed" id="netDetail">
+                <div class="navbar">
+                  <button class="nav-btn nav-back" id="netDetailBack" type="button"><svg><use href="#i-chev-l"/></svg><span data-i18n="network.title">Network</span></button>
+                  <span class="nav-title" id="netDetailTitle">api.example.com</span>
+                  <span></span>
+                </div>
+                <div class="scroll grouped" id="netDetailBody"></div>
+              </div>
+
+              <div class="view is-pushed" id="netPlain">
+                <div class="navbar">
+                  <button class="nav-btn nav-back" id="netPlainBack" type="button"><svg><use href="#i-chev-l"/></svg><span data-i18n="network.detail">Detail</span></button>
+                  <span class="nav-title" id="netPlainTitle">Response Body</span>
+                  <span></span>
+                </div>
+                <pre class="preview-body" id="netPlainText"></pre>
+              </div>
+            </div>
+          </div>
+        </div>
+      </figure>
+
+      <!-- UserDefaults -->
+      <figure class="shot reveal" id="shot-userdefaults" data-tool="userdefaults">
+        <header class="shot-head">
+          <span class="shot-icon"><svg><use href="#i-grid"/></svg></span>
+          <div class="shot-meta"><h3 data-i18n="userdefaults.title">UserDefaults</h3><p data-i18n="shot.userdefaults.sub">Browse, search, clean up</p></div>
+          <span class="shot-hint" data-i18n="shot.userdefaults.hint">Search keys, read values</span>
+        </header>
+        <div class="device">
+          <div class="device__screen" data-bg="grouped">
+            <div class="tool tool--grouped" id="udTool">
+              <div class="view" id="udMain">
+                <div class="navbar">
+                  <button class="nav-btn" type="button" aria-label="Close"><svg><use href="#i-x"/></svg></button>
+                  <span class="nav-title">UserDefaults</span>
+                  <button class="nav-btn nav-btn--text" type="button" data-i18n="userdefaults.edit">Edit</button>
+                </div>
+                <div class="searchrow">
+                  <div class="searchbar">
+                    <svg><use href="#i-search"/></svg>
+                    <input id="udSearch" type="search" placeholder="Search by key" data-i18n-placeholder="userdefaults.search" autocomplete="off" spellcheck="false">
+                  </div>
+                </div>
+                <div class="scroll grouped" id="udScroll">
+                  <div id="udList"></div>
+                  <div class="empty-state" id="udEmpty" hidden data-i18n="userdefaults.empty">No keys match that search.</div>
+                </div>
+              </div>
+              <div class="view is-pushed" id="udPlain">
+                <div class="navbar">
+                  <button class="nav-btn nav-back" id="udPlainBack" type="button"><svg><use href="#i-chev-l"/></svg>UserDefaults</button>
+                  <span class="nav-title" id="udPlainTitle">Key</span>
+                  <span></span>
+                </div>
+                <pre class="preview-body" id="udPlainText"></pre>
+              </div>
+            </div>
+          </div>
+        </div>
+      </figure>
+
+      <!-- Sandbox -->
+      <figure class="shot reveal" id="shot-sandbox" data-tool="sandbox">
+        <header class="shot-head">
+          <span class="shot-icon"><svg><use href="#i-folder"/></svg></span>
+          <div class="shot-meta"><h3 data-i18n="sandbox.title">Sandbox</h3><p data-i18n="shot.sandbox.sub">Files, previews, SQLite</p></div>
+          <span class="shot-hint" data-i18n="shot.sandbox.hint">Browse, preview, copy path</span>
+        </header>
+        <div class="device">
+          <div class="device__screen">
+            <div class="tool" id="sandboxTool">
+              <div class="view" id="sbMain">
+                <div class="navbar">
+                  <button class="nav-btn" type="button" aria-label="Close"><svg><use href="#i-x"/></svg></button>
+                  <span class="nav-title" data-i18n="sandbox.title">Sandbox</span>
+                  <span></span>
+                </div>
+                <div class="pathbar" id="sbPath"></div>
+                <div class="file-list" id="sbList"></div>
+              </div>
+              <div class="view is-pushed" id="sbPreview">
+                <div class="navbar">
+                  <button class="nav-btn nav-back" id="sbPreviewBack" type="button"><svg><use href="#i-chev-l"/></svg><span data-i18n="sandbox.title">Sandbox</span></button>
+                  <span class="nav-title" id="sbPreviewTitle">Preview</span>
+                  <span></span>
+                </div>
+                <pre class="preview-body" id="sbPreviewText"></pre>
+              </div>
+
+              <div class="sheet-backdrop" id="sbBackdrop"></div>
+              <div class="sheet-panel" id="sbSheet">
+                <div class="sheet-card">
+                  <div class="sheet-title" id="sbSheetTitle">File</div>
+                  <button class="sheet-btn" id="sbPreviewBtn" type="button" data-i18n="sandbox.preview">Preview</button>
+                  <button class="sheet-btn" id="sbShareBtn" type="button" data-i18n="sandbox.share">Share</button>
+                  <button class="sheet-btn" id="sbCopyBtn" type="button" data-i18n="sandbox.copy">Copy Path</button>
+                </div>
+                <div class="sheet-card">
+                  <button class="sheet-btn sheet-cancel" id="sbCancelBtn" type="button" data-i18n="common.cancel">Cancel</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </figure>
+
+      <!-- Performance -->
+      <figure class="shot reveal" id="shot-perf" data-tool="perf">
+        <header class="shot-head">
+          <span class="shot-icon"><svg><use href="#i-gauge"/></svg></span>
+          <div class="shot-meta"><h3 data-i18n="perf.title">Performance</h3><p data-i18n="shot.perf.sub">FPS · CPU · Memory</p></div>
+          <span class="shot-hint" data-i18n="shot.perf.hint">Floating metrics · report</span>
+        </header>
+        <div class="device">
+          <div class="device__screen" id="perfScreen">
+            <div class="tool" id="perfTool">
+              <div class="host perf-host" id="perfHost"></div>
+              <div class="perf-float" id="perfFloat" role="button" tabindex="0" aria-label="Performance overlay">
+                <div class="perf-head">
+                  <span class="perf-name" id="perfName">FPS</span>
+                  <span class="perf-num"><b id="perfValue">60</b><i id="perfUnit">fps</i></span>
+                </div>
+                <svg class="spark" viewBox="0 0 100 22" preserveAspectRatio="none" aria-hidden="true">
+                  <path class="spark-fill" id="perfFill" d="M0 22 L0 10 L100 10 L100 22 Z"></path>
+                  <path class="spark-line" id="perfLine" d="M0 10 L100 10"></path>
+                </svg>
+              </div>
+
+              <div class="perf-report" id="perfReport">
+                <div class="navbar">
+                  <button class="nav-btn" id="perfReportClose" type="button" aria-label="Close report"><svg><use href="#i-x"/></svg></button>
+                  <span class="nav-title" data-i18n="perf.title">Performance</span>
+                  <button class="nav-btn" type="button" aria-label="Settings"><svg><use href="#i-gear"/></svg></button>
+                </div>
+                <div class="scroll grouped">
+                  <p class="sec-title" data-i18n="perf.overview">Overview</p>
+                  <div class="timeline-card">
+                    <div class="timeline">
+                      <div class="lane">
+                        <span class="lane-label">FPS</span><span class="lane-max">60 fps</span>
+                        <svg viewBox="0 0 300 34" preserveAspectRatio="none" aria-hidden="true">
+                          <path class="spark-fill" style="fill:#0a84ff" d="M0 34 L0 22 L12 20 L24 24 L36 19 L48 21 L60 18 L72 20 L84 17 L96 19 L108 16 L120 18 L132 15 L144 17 L156 14 L168 16 L180 13 L192 15 L204 12 L216 14 L228 11 L240 13 L252 10 L264 12 L276 9 L288 11 L300 8 L300 34 Z"></path>
+                          <path class="spark-line" style="stroke:#0a84ff" d="M0 22 L12 20 L24 24 L36 19 L48 21 L60 18 L72 20 L84 17 L96 19 L108 16 L120 18 L132 15 L144 17 L156 14 L168 16 L180 13 L192 15 L204 12 L216 14 L228 11 L240 13 L252 10 L264 12 L276 9 L288 11 L300 8"></path>
+                          <path class="lane-base" d="M0 33.5H300"></path>
+                        </svg>
+                      </div>
+                      <div class="lane">
+                        <span class="lane-label">CPU</span><span class="lane-max">100 %</span>
+                        <svg viewBox="0 0 300 34" preserveAspectRatio="none" aria-hidden="true">
+                          <path class="spark-fill" style="fill:#ff9500" d="M0 34 L0 24 L20 22 L40 25 L60 21 L80 24 L100 19 L120 23 L140 26 L160 21 L180 24 L200 20 L220 23 L240 18 L260 22 L280 25 L300 21 L300 34 Z"></path>
+                          <path class="spark-line" style="stroke:#ff9500" d="M0 24 L20 22 L40 25 L60 21 L80 24 L100 19 L120 23 L140 26 L160 21 L180 24 L200 20 L220 23 L240 18 L260 22 L280 25 L300 21"></path>
+                          <path class="lane-base" d="M0 33.5H300"></path>
+                        </svg>
+                      </div>
+                      <div class="lane">
+                        <span class="lane-label" data-i18n="perf.memory">Memory</span><span class="lane-max">512 MB</span>
+                        <svg viewBox="0 0 300 34" preserveAspectRatio="none" aria-hidden="true">
+                          <path class="spark-fill" style="fill:#34c759" d="M0 34 L0 18 L30 17 L60 19 L90 16 L120 18 L150 15 L180 17 L210 14 L240 16 L270 13 L300 15 L300 34 Z"></path>
+                          <path class="spark-line" style="stroke:#34c759" d="M0 18 L30 17 L60 19 L90 16 L120 18 L150 15 L180 17 L210 14 L240 16 L270 13 L300 15"></path>
+                          <path class="lane-base" d="M0 33.5H300"></path>
+                        </svg>
+                      </div>
+                    </div>
+                    <div class="timeline-times"><span>10:23:41</span><span>10:24:11</span><span>10:24:41</span></div>
+                  </div>
+                  <div class="scope-card">
+                    <span class="scope-range">10:23:41 – 10:24:41</span>
+                    <span class="scope-all" data-i18n="perf.all">All</span>
+                  </div>
+
+                  <p class="sec-title" data-i18n="perf.memory">Memory</p>
+                  <div class="card">
+                    <div class="row"><span class="row-text"><span class="row-title" data-i18n="perf.total">Total</span></span><span class="row-value">512 MB</span></div>
+                    <div class="row"><span class="row-text"><span class="row-title" data-i18n="perf.average">Average</span></span><span class="row-value">184 MB · 36%</span></div>
+                    <div class="row"><span class="row-text"><span class="row-title" data-i18n="perf.peak">Peak</span></span><span class="row-value">231 MB · 45%</span></div>
+                    <div class="row"><span class="row-text"><span class="row-title" data-i18n="perf.graphics">Graphics</span></span><span class="row-value">68 MB · 13%</span></div>
+                    <div class="row"><span class="row-text"><span class="row-title" data-i18n="perf.media">Media</span></span><span class="row-value">42 MB · 8%</span></div>
+                    <div class="row"><span class="row-text"><span class="row-title" data-i18n="perf.network">Network</span></span><span class="row-value">12 MB · 2%</span></div>
+                    <div class="row"><span class="row-text"><span class="row-title" data-i18n="perf.rest">Other</span></span><span class="row-value">62 MB · 12%</span></div>
+                  </div>
+
+                  <p class="sec-title">CPU</p>
+                  <div class="card">
+                    <div class="row"><span class="row-text"><span class="row-title" data-i18n="perf.avg_usage">Average Usage</span></span><span class="row-value">23%</span></div>
+                    <div class="row"><span class="row-text"><span class="row-title" data-i18n="perf.peak">Peak</span></span><span class="row-value">47%</span></div>
+                    <div class="row"><span class="row-text"><span class="row-title" data-i18n="perf.cpu_time">Total CPU Time</span></span><span class="row-value">18 s</span></div>
+                  </div>
+
+                  <p class="sec-title">FPS</p>
+                  <div class="card">
+                    <div class="row"><span class="row-text"><span class="row-title" data-i18n="perf.avg_fps">Average FPS</span></span><span class="row-value">59 fps</span></div>
+                    <div class="row"><span class="row-text"><span class="row-title" data-i18n="perf.slow">Slow Frames</span></span><span class="row-value">3</span></div>
+                    <div class="row"><span class="row-text"><span class="row-title" data-i18n="perf.frozen">Frozen Frames</span></span><span class="row-value">0</span></div>
+                    <div class="row"><span class="row-text"><span class="row-title" data-i18n="perf.total_frames">Total Frames</span></span><span class="row-value">3582</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </figure>
     </div>
   </section>
 
   <footer class="footer wrap">
     <div class="install-card reveal">
       <div>
-        <div class="eyebrow"><span class="pulse"></span>Install</div>
-        <h2>Drop it in.<br>Flip it on.</h2>
+        <div class="eyebrow"><span class="pulse"></span><span data-i18n="footer.install">Install</span></div>
+        <h2 data-i18n-html="footer.title">Drop it in.<br>Flip it on.</h2>
       </div>
       <div class="install-lines">
-        <div class="code-line">
-          <span class="code-label">CocoaPods</span>
-          <code>pod 'DoSwiftKit'</code>
-          <button class="copy-btn" type="button" data-copy="pod 'DoSwiftKit'" aria-label="Copy CocoaPods command"><svg><use href="#i-copy"/></svg></button>
+        <div class="code-block">
+          <div class="code-head">
+            <span class="code-label">CocoaPods</span>
+            <button class="copy-btn code-copy" type="button" aria-label="Copy CocoaPods command"><svg><use href="#i-copy"/></svg></button>
+          </div>
+          <pre class="code-body"><code>pod 'DoSwiftKit',
+  :git =&gt; 'https://github.com/darkThanBlack/DoSwiftKit.git',
+  :branch =&gt; 'main',
+  :tag =&gt; '1.0.0'</code></pre>
         </div>
-        <div class="code-line">
-          <span class="code-label">SwiftPM</span>
-          <code>.package(url: "https://github.com/darkThanBlack/DoSwiftKit.git", from: "1.0.0")</code>
-          <button class="copy-btn" type="button" data-copy=".package(url: &quot;https://github.com/darkThanBlack/DoSwiftKit.git&quot;, from: &quot;1.0.0&quot;)" aria-label="Copy SwiftPM command"><svg><use href="#i-copy"/></svg></button>
+        <div class="code-block">
+          <div class="code-head">
+            <span class="code-label">SwiftPM</span>
+            <button class="copy-btn code-copy" type="button" aria-label="Copy SwiftPM command"><svg><use href="#i-copy"/></svg></button>
+          </div>
+          <pre class="code-body"><code>.package(
+  url: "https://github.com/darkThanBlack/DoSwiftKit.git",
+  from: "1.0.0"
+)</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-head">
+            <span class="code-label" data-i18n="footer.init">Initialization</span>
+            <button class="copy-btn code-copy" type="button" aria-label="Copy initialization code"><svg><use href="#i-copy"/></svg></button>
+          </div>
+          <pre class="code-body"><code>// SceneDelegate.swift
+#if DEBUG
+DO.Core.shared.setup(appScene: windowScene, appWindow: window)
+DO.NetworkPlugin.shared.start()
+DO.ConsolePlugin.shared.start()
+#endif
+
+// AppDelegate.swift (without scenes)
+#if DEBUG
+DO.Core.shared.setup(appScene: window?.windowScene, appWindow: window)
+#endif</code></pre>
         </div>
       </div>
     </div>
     <div class="footer-bottom">
       <span>DoSwiftKit · WTFPL</span>
-      <span>Pure Swift. No dependencies. iOS 13+.</span>
+      <span data-i18n="footer.note">Pure Swift. No dependencies. iOS 13+.</span>
       <span class="spacer"></span>
       <a href="https://github.com/darkThanBlack/DoSwiftKit" target="_blank" rel="noreferrer">GitHub ↗</a>
       <a href="https://github.com/darkThanBlack/DoSwiftKit/issues" target="_blank" rel="noreferrer">Issues ↗</a>
@@ -1901,6 +1975,402 @@ html[data-theme="dark"] .shot { box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) in
   };
   var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var root = document.documentElement;
+
+  /* ----------------------------------------------------------
+     Language
+     ---------------------------------------------------------- */
+  var lang = (function () {
+    try {
+      var saved = localStorage.getItem('doswift-lang');
+      if (saved === 'zh' || saved === 'en') return saved;
+    } catch (e) {}
+    return 'en';
+  })();
+
+  var translations = {
+    en: {
+      'meta.title': 'DoSwift — pure Swift iOS debug toolkit',
+      'nav.tools': 'Tools',
+      'nav.docs': 'Documentation',
+      'hero.eyebrow': 'Pure Swift · iOS 13+',
+      'hero.lead': 'A debug overlay for iOS that stays out of the way — until you need it. Inspect and edit live views, capture traffic, watch performance, all from one floating button.',
+      'hero.zero': 'Zero dependencies',
+      'hero.dark': 'Dark mode',
+      'hero.github': 'View on GitHub',
+      'hero.explore': 'Explore the tools',
+      'section.eyebrow': 'Seven tools · one button',
+      'section.title': 'Everything you need, already on screen.',
+      'section.sub': 'Live view inspection, network capture, console, performance, UserDefaults and sandbox — the whole debug toolkit runs inside your app. No cable, no rebuild.',
+      'shot.appinfo.sub': 'Device, build, permissions',
+      'shot.appinfo.hint': 'Tap-to-copy values',
+      'shot.console.sub': 'stdout · stderr · os_log',
+      'shot.console.hint': 'Search · pause · capture',
+      'shot.network.sub': 'URLSession capture',
+      'shot.network.hint': 'Requests → responses',
+      'shot.userdefaults.sub': 'Browse, search, clean up',
+      'shot.userdefaults.hint': 'Search keys, read values',
+      'shot.sandbox.sub': 'Files, previews, SQLite',
+      'shot.sandbox.hint': 'Browse, preview, copy path',
+      'shot.perf.sub': 'FPS · CPU · Memory',
+      'shot.perf.hint': 'Floating metrics · report',
+      'shot.hierarchy.sub': 'Pick, measure, edit — live',
+      'shot.hierarchy.hint': 'Picker · ruler · live edits',
+      'menu.visual': 'Visual',
+      'menu.info': 'Info',
+      'menu.performance': 'Performance',
+      'hierarchy.title': 'UI Hierarchy',
+      'appinfo.title': 'App Info',
+      'appinfo.copy': 'Copy JSON',
+      'appinfo.device': 'Device',
+      'appinfo.application': 'Application',
+      'appinfo.permissions': 'Permissions',
+      'appinfo.model': 'Model',
+      'appinfo.system': 'System Version',
+      'appinfo.screen': 'Screen',
+      'appinfo.version': 'Version',
+      'appinfo.build': 'Build',
+      'appinfo.distribution': 'Distribution',
+      'appinfo.runtime': 'Runtime Form',
+      'appinfo.location': 'Location',
+      'appinfo.notifications': 'Notifications',
+      'appinfo.camera': 'Camera',
+      'appinfo.microphone': 'Microphone',
+      'appinfo.photos': 'Photos',
+      'appinfo.dev_enterprise': 'Development / Enterprise',
+      'appinfo.simulator': 'Simulator',
+      'appinfo.while_using': 'While Using',
+      'appinfo.authorized': 'Authorized',
+      'appinfo.not_determined': 'Not Determined',
+      'appinfo.limited': 'Limited',
+      'console.title': 'Console',
+      'console.search': 'Search lines',
+      'console.status.initial': 'total 248   fd1 132   fd2 9   oslog 107  ·  read in 0.8s',
+      'console.status.sources': 'total 248   fd1 132   fd2 9   oslog 107',
+      'console.status.read': 'read in 0.8s',
+      'console.status.capture_off': 'capture off',
+      'console.status.paused': 'paused',
+      'console.empty': 'No matching lines.',
+      'console.aria.capture_on': 'Stop capture',
+      'console.aria.capture_off': 'Start capture',
+      'console.aria.pause': 'Pause',
+      'console.aria.resume': 'Resume',
+      'network.title': 'Network',
+      'network.requests': 'Requests (%d)',
+      'network.failed': 'Failed',
+      'network.detail': 'Detail',
+      'network.empty': 'No requests captured. Only URLSession is covered — WKWebView, WebSocket and raw sockets are not; sessions created before capture started are covered from the next session on.',
+      'network.overview': 'Overview',
+      'network.request': 'Request',
+      'network.response': 'Response',
+      'network.url': 'URL',
+      'network.method': 'Method',
+      'network.status': 'Status',
+      'network.duration': 'Duration',
+      'network.req_headers': 'Request Headers',
+      'network.req_body': 'Request Body',
+      'network.res_headers': 'Response Headers',
+      'network.res_body': 'Response Body',
+      'network.none': 'None',
+      'network.view': 'View',
+      'common.clear': 'Clear',
+      'common.stop_capture': 'Stop Capture',
+      'common.start_capture': 'Start Capture',
+      'common.cancel': 'Cancel',
+      'userdefaults.title': 'UserDefaults',
+      'userdefaults.edit': 'Edit',
+      'userdefaults.search': 'Search by key',
+      'userdefaults.empty': 'No keys match that search.',
+      'userdefaults.domain.app': 'App',
+      'userdefaults.domain.global': 'globalDomain',
+      'userdefaults.domain.other': 'Other Domains',
+      'sandbox.title': 'Sandbox',
+      'sandbox.root': 'Sandbox',
+      'sandbox.preview': 'Preview',
+      'sandbox.share': 'Share',
+      'sandbox.copy': 'Copy Path',
+      'sandbox.empty': 'Empty Folder',
+      'sandbox.no_preview': 'No preview available',
+      'sandbox.share_disabled': 'Sharing is disabled in this preview',
+      'sandbox.path_copied': 'Path copied',
+      'perf.title': 'Performance',
+      'perf.overview': 'Overview',
+      'perf.memory': 'Memory',
+      'perf.all': 'All',
+      'perf.total': 'Total',
+      'perf.average': 'Average',
+      'perf.peak': 'Peak',
+      'perf.graphics': 'Graphics',
+      'perf.media': 'Media',
+      'perf.network': 'Network',
+      'perf.rest': 'Other',
+      'perf.avg_usage': 'Average Usage',
+      'perf.cpu_time': 'Total CPU Time',
+      'perf.avg_fps': 'Average FPS',
+      'perf.slow': 'Slow Frames',
+      'perf.frozen': 'Frozen Frames',
+      'perf.total_frames': 'Total Frames',
+      'perf.metric.fps': 'FPS',
+      'perf.metric.cpu': 'CPU',
+      'perf.metric.memory': 'Memory',
+      'hs.info_title': 'Current focus',
+      'hs.key.position': 'Position:',
+      'hs.key.name': 'Name:',
+      'hs.key.pixel': 'Pixel:',
+      'hs.key.frame': 'Frame:',
+      'hs.key.background': 'Background:',
+      'hs.key.text_color': 'Text Color:',
+      'hs.key.font': 'Font:',
+      'hs.key.tag': 'Tag:',
+      'hs.action.tree': 'Tree',
+      'hs.action.parents': 'Parents',
+      'hs.action.children': 'Children',
+      'hs.action.detail': 'Detail',
+      'hs.seg.properties': 'Properties',
+      'hs.seg.layer': 'Layer',
+      'hs.seg.layout': 'Layout',
+      'hs.tree_title': 'View Tree',
+      'hs.focus': 'Focus',
+      'hs.sec.uiView': 'UIView',
+      'hs.sec.object': 'Object',
+      'hs.sec.drawing': 'Drawing',
+      'hs.sec.transform': 'Transform',
+      'hs.sec.animations': 'Animations',
+      'hs.sec.diagnostics': 'Diagnostics',
+      'hs.sec.common': 'Common',
+      'hs.sec.constraints': 'Constraints',
+      'hs.sec.effective': 'Effective Values',
+      'hs.sec.traits': 'Traits & RTL',
+      'footer.install': 'Install',
+      'footer.init': 'Initialization',
+      'footer.title': 'Drop it in.<br>Flip it on.',
+      'footer.note': 'Pure Swift. No dependencies. iOS 13+.',
+      'toast.copied': 'Copied',
+      'toast.path_copied': 'Path copied',
+      'toast.no_preview': 'No preview available',
+      'toast.share_disabled': 'Sharing is disabled in this preview',
+      'lang.aria': 'Switch to Chinese',
+      'theme.aria': 'Toggle light or dark appearance'
+    },
+    zh: {
+      'meta.title': 'DoSwift — 纯 Swift iOS 调试工具包',
+      'nav.tools': '工具',
+      'nav.docs': '文档',
+      'hero.eyebrow': '纯 Swift · iOS 13+',
+      'hero.lead': '一个不挡路的 iOS 调试浮层——需要时再出现。查看并修改实时视图、抓取网络、观察性能，全部从一个浮窗开始。',
+      'hero.zero': '零依赖',
+      'hero.dark': '深色模式',
+      'hero.github': '在 GitHub 查看',
+      'hero.explore': '浏览工具',
+      'section.eyebrow': '七个工具 · 一个按钮',
+      'section.title': '需要的工具，都已经在屏幕上。',
+      'section.sub': '视图检查、网络抓包、控制台、性能采样、UserDefaults 与沙盒——整套调试工具直接跑在 App 里。不用连电脑，也不用重新编译。',
+      'shot.appinfo.sub': '设备、构建号、权限',
+      'shot.appinfo.hint': '点按复制',
+      'shot.console.sub': 'stdout · stderr · os_log',
+      'shot.console.hint': '搜索 · 暂停 · 采集',
+      'shot.network.sub': 'URLSession 抓包',
+      'shot.network.hint': '请求 → 响应',
+      'shot.userdefaults.sub': '浏览、搜索、清理',
+      'shot.userdefaults.hint': '搜索 key，查看值',
+      'shot.sandbox.sub': '文件、预览、SQLite',
+      'shot.sandbox.hint': '浏览、预览、复制路径',
+      'shot.perf.sub': 'FPS · CPU · 内存',
+      'shot.perf.hint': '浮窗指标 · 报表',
+      'shot.hierarchy.sub': '选取、测量、实时编辑',
+      'shot.hierarchy.hint': '取色 · 标尺 · 实时编辑',
+      'menu.visual': '可视化',
+      'menu.info': '信息',
+      'menu.performance': '仪表盘',
+      'hierarchy.title': '视图结构',
+      'appinfo.title': '基础信息',
+      'appinfo.copy': '复制 JSON',
+      'appinfo.device': '设备',
+      'appinfo.application': '应用',
+      'appinfo.permissions': '权限',
+      'appinfo.model': '机型',
+      'appinfo.system': '系统版本',
+      'appinfo.screen': '屏幕',
+      'appinfo.version': '版本',
+      'appinfo.build': '构建号',
+      'appinfo.distribution': '分发渠道',
+      'appinfo.runtime': '运行态',
+      'appinfo.location': '地理位置',
+      'appinfo.notifications': '通知',
+      'appinfo.camera': '相机',
+      'appinfo.microphone': '麦克风',
+      'appinfo.photos': '相册',
+      'appinfo.dev_enterprise': '开发 / 企业签名',
+      'appinfo.simulator': '模拟器',
+      'appinfo.while_using': '使用期间',
+      'appinfo.authorized': '已授权',
+      'appinfo.not_determined': '未决定',
+      'appinfo.limited': '部分授权',
+      'console.title': 'Console',
+      'console.search': '搜索日志',
+      'console.status.initial': '共 248 条   fd1 132   fd2 9   oslog 107  ·  读取耗时 0.8s',
+      'console.status.sources': '共 248 条   fd1 132   fd2 9   oslog 107',
+      'console.status.read': '读取耗时 0.8s',
+      'console.status.capture_off': '采集已关闭',
+      'console.status.paused': '已暂停',
+      'console.empty': '没有匹配的日志。',
+      'console.aria.capture_on': '停止采集',
+      'console.aria.capture_off': '开始采集',
+      'console.aria.pause': '暂停',
+      'console.aria.resume': '继续',
+      'network.title': '网络',
+      'network.requests': '请求（%d）',
+      'network.failed': '失败',
+      'network.detail': '详情',
+      'network.empty': '没有捕获到请求。采集只覆盖 URLSession —— WKWebView、WebSocket 和裸 socket 都不在其中；开启采集之前创建的 session 也要等下一个 session 建出来才会被覆盖。',
+      'network.overview': '概要',
+      'network.request': '请求',
+      'network.response': '响应',
+      'network.url': 'URL',
+      'network.method': 'Method',
+      'network.status': 'Status',
+      'network.duration': 'Duration',
+      'network.req_headers': '请求头',
+      'network.req_body': '请求体',
+      'network.res_headers': '响应头',
+      'network.res_body': '响应体',
+      'network.none': '无',
+      'network.view': '查看',
+      'common.clear': '清空',
+      'common.stop_capture': '停止采集',
+      'common.start_capture': '开始采集',
+      'common.cancel': '取消',
+      'userdefaults.title': 'UserDefaults',
+      'userdefaults.edit': '编辑',
+      'userdefaults.search': '按 key 搜索',
+      'userdefaults.empty': '没有匹配的 key。',
+      'userdefaults.domain.app': 'App',
+      'userdefaults.domain.global': 'globalDomain',
+      'userdefaults.domain.other': '其他域',
+      'sandbox.title': 'Sandbox',
+      'sandbox.root': 'Sandbox',
+      'sandbox.preview': '本地预览',
+      'sandbox.share': '分享',
+      'sandbox.copy': '复制路径',
+      'sandbox.empty': '空文件夹',
+      'sandbox.no_preview': '没有可预览的内容',
+      'sandbox.share_disabled': '预览页面不提供分享',
+      'sandbox.path_copied': '已复制路径',
+      'perf.title': '仪表盘',
+      'perf.overview': '总览',
+      'perf.memory': '内存',
+      'perf.all': '全部',
+      'perf.total': '总额',
+      'perf.average': '平均',
+      'perf.peak': '峰值',
+      'perf.graphics': '图形',
+      'perf.media': '媒体',
+      'perf.network': '网络',
+      'perf.rest': '其余',
+      'perf.avg_usage': '平均占用',
+      'perf.cpu_time': '累计 CPU 时间',
+      'perf.avg_fps': '平均帧率',
+      'perf.slow': '慢帧',
+      'perf.frozen': '冻结帧',
+      'perf.total_frames': '总帧数',
+      'perf.metric.fps': 'FPS',
+      'perf.metric.cpu': 'CPU',
+      'perf.metric.memory': '内存',
+      'hs.info_title': '当前焦点',
+      'hs.key.position': 'position',
+      'hs.key.name': 'name',
+      'hs.key.pixel': 'color',
+      'hs.key.frame': 'frame',
+      'hs.key.background': 'backgroundColor',
+      'hs.key.text_color': 'textColor',
+      'hs.key.font': 'font',
+      'hs.key.tag': 'tag',
+      'hs.action.tree': '树',
+      'hs.action.parents': '父视图',
+      'hs.action.children': '子视图',
+      'hs.action.detail': '详情',
+      'hs.seg.properties': '属性',
+      'hs.seg.layer': '图层',
+      'hs.seg.layout': '布局',
+      'hs.tree_title': '视图树',
+      'hs.focus': '聚焦',
+      'hs.sec.uiView': 'UIView',
+      'hs.sec.object': 'Object',
+      'hs.sec.drawing': '绘制',
+      'hs.sec.transform': '变换',
+      'hs.sec.animations': '动画',
+      'hs.sec.diagnostics': '诊断',
+      'hs.sec.common': '通用',
+      'hs.sec.constraints': '约束',
+      'hs.sec.effective': '特性',
+      'hs.sec.traits': '环境变量',
+      'footer.install': '安装',
+      'footer.init': '初始化',
+      'footer.title': '接入项目。<br>打开开关。',
+      'footer.note': '纯 Swift。零依赖。iOS 13+。',
+      'toast.copied': '已复制',
+      'toast.path_copied': '已复制路径',
+      'toast.no_preview': '没有可预览的内容',
+      'toast.share_disabled': '预览页面不提供分享',
+      'lang.aria': '切换到英文',
+      'theme.aria': '切换深色 / 浅色'
+    }
+  };
+
+  function t(key) {
+    var table = translations[lang] || translations.en;
+    if (Object.prototype.hasOwnProperty.call(table, key)) return table[key];
+    if (Object.prototype.hasOwnProperty.call(translations.en, key)) return translations.en[key];
+    return key;
+  }
+
+  function tn(key, value) {
+    return t(key).replace('%d', String(value));
+  }
+
+  var refreshConsole = null;
+  var refreshNetwork = null;
+  var refreshUserDefaults = null;
+  var refreshSandbox = null;
+  var refreshPerf = null;
+  var refreshHierarchy = null;
+
+  function applyLanguage(persist) {
+    root.lang = lang === 'zh' ? 'zh-Hans' : 'en';
+    root.dataset.lang = lang;
+
+    var label = $('#langLabel');
+    if (label) label.textContent = lang === 'en' ? '中' : 'EN';
+    var langButton = $('#langBtn');
+    if (langButton) {
+      langButton.setAttribute('aria-label', t('lang.aria'));
+      langButton.title = lang === 'en' ? '中文' : 'English';
+    }
+    var themeButton = $('#themeBtn');
+    if (themeButton) themeButton.setAttribute('aria-label', t('theme.aria'));
+
+    $$('[data-i18n]').forEach(function (el) {
+      el.textContent = t(el.getAttribute('data-i18n'));
+    });
+    $$('[data-i18n-html]').forEach(function (el) {
+      el.innerHTML = t(el.getAttribute('data-i18n-html'));
+    });
+    $$('[data-i18n-placeholder]').forEach(function (el) {
+      el.setAttribute('placeholder', t(el.getAttribute('data-i18n-placeholder')));
+    });
+
+    document.title = t('meta.title');
+
+    if (refreshConsole) refreshConsole();
+    if (refreshNetwork) refreshNetwork();
+    if (refreshUserDefaults) refreshUserDefaults();
+    if (refreshSandbox) refreshSandbox();
+    if (refreshPerf) refreshPerf();
+    if (refreshHierarchy) refreshHierarchy();
+
+    if (persist !== false) {
+      try { localStorage.setItem('doswift-lang', lang); } catch (e) {}
+    }
+  }
 
   /* ----------------------------------------------------------
      Toast + clipboard
@@ -1944,6 +2414,10 @@ html[data-theme="dark"] .shot { box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) in
     try { localStorage.setItem('doswift-theme', root.dataset.theme); } catch (e) {}
     syncThemeIcon();
   });
+  $('#langBtn').addEventListener('click', function () {
+    lang = lang === 'en' ? 'zh' : 'en';
+    applyLanguage();
+  });
   var scheme = window.matchMedia('(prefers-color-scheme: dark)');
   if (scheme.addEventListener) {
     scheme.addEventListener('change', function (event) {
@@ -1980,7 +2454,16 @@ html[data-theme="dark"] .shot { box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) in
     el.addEventListener('click', function (event) {
       event.preventDefault();
       copyText(el.getAttribute('data-copy'));
-      toast('Copied');
+      toast(t('toast.copied'));
+    });
+  });
+  $$('.code-copy').forEach(function (button) {
+    button.addEventListener('click', function () {
+      var block = button.closest('.code-block');
+      var code = block ? block.querySelector('code') : null;
+      if (!code) return;
+      copyText(code.textContent);
+      toast(t('toast.copied'));
     });
   });
 
@@ -2002,7 +2485,7 @@ html[data-theme="dark"] .shot { box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) in
       var ph = panel.offsetHeight;
       var dockRight = hx > sr.width / 2;
       var y = hy > sr.height / 2 ? hy - 34 - ph : hy + 34;
-      y = clamp(y, 50, sr.height - ph - 12);
+      y = clamp(y, 50, sr.height - ph - 28);
       panel.style.top = y + 'px';
       panel.style.left = dockRight ? 'auto' : '0px';
       panel.style.right = dockRight ? '0px' : 'auto';
@@ -2118,9 +2601,10 @@ html[data-theme="dark"] .shot { box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) in
         '<div class="log-meta">' + esc(line.t) + '  ' + esc(line.tag) + '</div>' +
         '<div class="log-msg">' + esc(line.text) + '</div>' +
         '</div>';
-    }).join('') + '<div class="empty-state" id="consoleEmpty" hidden>No matching lines.</div>';
+    }).join('') + '<div class="empty-state" id="consoleEmpty" hidden></div>';
 
     var empty = $('#consoleEmpty');
+    empty.textContent = t('console.empty');
     function filter() {
       var q = search.value.trim().toLowerCase();
       var visible = 0;
@@ -2139,7 +2623,7 @@ html[data-theme="dark"] .shot { box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) in
       capture.classList.toggle('is-red', capturing);
       capture.classList.toggle('is-muted', !capturing);
       capture.innerHTML = '<svg><use href="#i-' + (capturing ? 'stop' : 'record') + '"/></svg>';
-      capture.setAttribute('aria-label', capturing ? 'Stop capture' : 'Start capture');
+      capture.setAttribute('aria-label', capturing ? t('console.aria.capture_on') : t('console.aria.capture_off'));
       updateStatus();
     });
 
@@ -2147,15 +2631,24 @@ html[data-theme="dark"] .shot { box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) in
     pause.addEventListener('click', function () {
       paused = !paused;
       pause.innerHTML = '<svg><use href="#i-' + (paused ? 'play' : 'pause') + '"/></svg>';
-      pause.setAttribute('aria-label', paused ? 'Resume' : 'Pause');
+      pause.setAttribute('aria-label', paused ? t('console.aria.resume') : t('console.aria.pause'));
       list.style.opacity = paused ? '0.55' : '1';
       updateStatus();
     });
 
     function updateStatus() {
-      status.textContent = 'total 248   fd1 132   fd2 9   oslog 107  ·  read in 0.8s' +
-        (capturing ? '' : '  ·  capture off') + (paused ? '  ·  paused' : '');
+      status.textContent = t('console.status.sources') + '  ·  ' + t('console.status.read') +
+        (capturing ? '' : '  ·  ' + t('console.status.capture_off')) +
+        (paused ? '  ·  ' + t('console.status.paused') : '');
     }
+
+    refreshConsole = function () {
+      empty.textContent = t('console.empty');
+      capture.setAttribute('aria-label', capturing ? t('console.aria.capture_on') : t('console.aria.capture_off'));
+      pause.setAttribute('aria-label', paused ? t('console.aria.resume') : t('console.aria.pause'));
+      updateStatus();
+    };
+    updateStatus();
   }
 
   /* ----------------------------------------------------------
@@ -2210,6 +2703,38 @@ html[data-theme="dark"] .shot { box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) in
       reqBody: null,
       resHeaders: 'cache-control: max-age=30\ncontent-type: application/json',
       resBody: '{\n  "query": "sneaker",\n  "total": 118,\n  "items": [\n    { "id": 3188, "title": "Trail Runner 2", "price": 148 },\n    { "id": 3190, "title": "Court Low", "price": 96 }\n  ]\n}'
+    },
+    {
+      method: 'GET', path: '/api/trips/kyoto', status: 200, ms: 96, size: '3.4 KB', time: '10:24:16',
+      host: 'api.example.com', url: 'https://api.example.com/api/trips/kyoto',
+      reqHeaders: 'accept: application/json\nauthorization: Bearer eyJhbGciOi…',
+      reqBody: null,
+      resHeaders: 'cache-control: private, max-age=300\ncontent-type: application/json',
+      resBody: '{\n  "id": "kyoto-2026",\n  "nights": 6,\n  "price": 2480,\n  "season": "autumn"\n}'
+    },
+    {
+      method: 'POST', path: '/api/analytics/batch', status: 202, ms: 41, size: null, time: '10:24:12',
+      host: 'api.example.com', url: 'https://api.example.com/api/analytics/batch',
+      reqHeaders: 'content-type: application/json\nx-batch-size: 24',
+      reqBody: '{"events":24}',
+      resHeaders: 'content-type: application/json',
+      resBody: null
+    },
+    {
+      method: 'GET', path: '/media/rooms/8842/1.webp', status: 200, ms: 187, size: '48.2 KB', time: '10:24:09',
+      host: 'cdn.example.com', url: 'https://cdn.example.com/media/rooms/8842/1.webp',
+      reqHeaders: 'accept: image/webp,image/*',
+      reqBody: null,
+      resHeaders: 'cache-control: public, max-age=86400\ncontent-type: image/webp',
+      resBody: null
+    },
+    {
+      method: 'GET', path: '/api/notifications?unread=1', status: 200, ms: 73, size: '640 B', time: '10:24:05',
+      host: 'api.example.com', url: 'https://api.example.com/api/notifications?unread=1',
+      reqHeaders: 'accept: application/json',
+      reqBody: null,
+      resHeaders: 'content-type: application/json',
+      resBody: '{\n  "unread": 3,\n  "items": [\n    { "id": 91, "type": "trip", "read": false }\n  ]\n}'
     }
   ];
 
@@ -2224,20 +2749,28 @@ html[data-theme="dark"] .shot { box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) in
     var plainText = $('#netPlainText');
     var capture = $('#netCapture');
 
-    var listHTML = netRecords.map(function (record, index) {
-      var statusText = record.error ? 'Failed' : String(record.status);
-      var parts = [statusText, record.ms + ' ms'];
-      if (record.size) parts.push(record.size);
-      parts.push(record.time);
-      return '<button class="row row--tap" type="button" data-index="' + index + '">' +
-        '<span class="row-text">' +
-          '<span class="row-title">' + esc(record.method + '  ' + record.path) + '</span>' +
-          '<span class="row-detail">' + esc(parts.join('  ·  ')) + '</span>' +
-        '</span>' +
-        '<svg class="chev"><use href="#i-chev-r"/></svg>' +
-        '</button>';
-    }).join('');
-    rows.innerHTML = listHTML;
+    var currentIndex = -1;
+    var detailOpen = false;
+    var plainOpen = false;
+    var plainState = null;
+
+    function renderList() {
+      rows.innerHTML = netRecords.map(function (record, index) {
+        var statusText = record.error ? t('network.failed') : String(record.status);
+        var parts = [statusText, record.ms + ' ms'];
+        if (record.size) parts.push(record.size);
+        parts.push(record.time);
+        return '<button class="row row--tap" type="button" data-index="' + index + '">' +
+          '<span class="row-text">' +
+            '<span class="row-title">' + esc(record.method + '  ' + record.path) + '</span>' +
+            '<span class="row-detail">' + esc(parts.join('  ·  ')) + '</span>' +
+          '</span>' +
+          '<svg class="chev"><use href="#i-chev-r"/></svg>' +
+          '</button>';
+      }).join('');
+      $('#netSectionTitle').textContent = tn('network.requests', 24);
+    }
+    renderList();
 
     rows.addEventListener('click', function (event) {
       var button = event.target.closest('[data-index]');
@@ -2246,9 +2779,9 @@ html[data-theme="dark"] .shot { box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) in
     });
 
     function summary(text) {
-      if (!text) return 'None';
+      if (!text) return t('network.none');
       var first = text.split('\n')[0].trim();
-      if (!first) return 'View';
+      if (!first) return t('network.view');
       return first.length > 64 ? first.slice(0, 64) + '…' : first;
     }
 
@@ -2257,12 +2790,13 @@ html[data-theme="dark"] .shot { box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) in
         '</span><span class="row-detail">' + esc(detailText) + '</span></span></div>';
     }
 
-    function textRow(title, text) {
+    function textRow(titleKey, text) {
+      var title = t(titleKey);
       if (!text) {
         return '<div class="row"><span class="row-text"><span class="row-title">' + esc(title) +
-          '</span><span class="row-detail">None</span></span></div>';
+          '</span><span class="row-detail">' + esc(t('network.none')) + '</span></span></div>';
       }
-      return '<button class="row row--tap net-text-row" type="button" data-label="' + esc(title) +
+      return '<button class="row row--tap net-text-row" type="button" data-label-key="' + esc(titleKey) +
         '" data-text="' + encodeURIComponent(text) + '">' +
         '<span class="row-text"><span class="row-title">' + esc(title) +
         '</span><span class="row-detail">' + esc(summary(text)) + '</span></span>' +
@@ -2272,21 +2806,23 @@ html[data-theme="dark"] .shot { box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) in
     function openDetail(index) {
       var record = netRecords[index];
       if (!record) return;
+      currentIndex = index;
+      detailOpen = true;
       detailTitle.textContent = record.host;
       detailBody.innerHTML =
-        '<p class="sec-title">Overview</p><div class="card">' +
-          kv('URL', record.url) +
-          kv('Method', record.method) +
-          kv('Status', record.error || String(record.status)) +
-          kv('Duration', record.ms + ' ms') +
+        '<p class="sec-title">' + esc(t('network.overview')) + '</p><div class="card">' +
+          kv(t('network.url'), record.url) +
+          kv(t('network.method'), record.method) +
+          kv(t('network.status'), record.error || String(record.status)) +
+          kv(t('network.duration'), record.ms + ' ms') +
         '</div>' +
-        '<p class="sec-title">Request</p><div class="card">' +
-          textRow('Request Headers', record.reqHeaders) +
-          textRow('Request Body', record.reqBody) +
+        '<p class="sec-title">' + esc(t('network.request')) + '</p><div class="card">' +
+          textRow('network.req_headers', record.reqHeaders) +
+          textRow('network.req_body', record.reqBody) +
         '</div>' +
-        '<p class="sec-title">Response</p><div class="card">' +
-          textRow('Response Headers', record.resHeaders) +
-          textRow('Response Body', record.resBody) +
+        '<p class="sec-title">' + esc(t('network.response')) + '</p><div class="card">' +
+          textRow('network.res_headers', record.resHeaders) +
+          textRow('network.res_body', record.resBody) +
         '</div>';
       detailBody.scrollTop = 0;
       main.classList.add('is-behind');
@@ -2296,11 +2832,13 @@ html[data-theme="dark"] .shot { box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) in
     detailBody.addEventListener('click', function (event) {
       var button = event.target.closest('.net-text-row');
       if (!button) return;
-      openPlain(button.getAttribute('data-label'), decodeURIComponent(button.getAttribute('data-text') || ''));
+      openPlain(button.getAttribute('data-label-key'), decodeURIComponent(button.getAttribute('data-text') || ''));
     });
 
-    function openPlain(label, text) {
-      plainTitle.textContent = label;
+    function openPlain(labelKey, text) {
+      plainState = { key: labelKey, text: text };
+      plainOpen = true;
+      plainTitle.textContent = t(labelKey);
       plainText.textContent = text;
       plainText.scrollTop = 0;
       detail.classList.add('is-behind');
@@ -2308,10 +2846,14 @@ html[data-theme="dark"] .shot { box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) in
     }
 
     $('#netDetailBack').addEventListener('click', function () {
+      detailOpen = false;
+      plainOpen = false;
       detail.classList.add('is-pushed');
+      plain.classList.add('is-pushed');
       main.classList.remove('is-behind');
     });
     $('#netPlainBack').addEventListener('click', function () {
+      plainOpen = false;
       plain.classList.add('is-pushed');
       detail.classList.remove('is-behind');
     });
@@ -2319,16 +2861,29 @@ html[data-theme="dark"] .shot { box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) in
     var capturing = true;
     capture.addEventListener('click', function () {
       capturing = !capturing;
-      capture.textContent = capturing ? 'Stop Capture' : 'Start Capture';
+      capture.textContent = capturing ? t('common.stop_capture') : t('common.start_capture');
       capture.classList.toggle('destructive', capturing);
     });
+
+    refreshNetwork = function () {
+      renderList();
+      capture.textContent = capturing ? t('common.stop_capture') : t('common.start_capture');
+      if (detailOpen && currentIndex >= 0) {
+        var scroll = detailBody.scrollTop;
+        openDetail(currentIndex);
+        detailBody.scrollTop = scroll;
+      }
+      if (plainOpen && plainState) {
+        plainTitle.textContent = t(plainState.key);
+      }
+    };
   }
 
   /* ----------------------------------------------------------
      UserDefaults
      ---------------------------------------------------------- */
   var udData = [
-    { title: 'App', items: [
+    { titleKey: 'userdefaults.domain.app', items: [
       { k: 'onboarding.completed', v: 'true' },
       { k: 'feature.flags', v: '["newCheckout": true, "darkNavigation": false, "aiHints": true, "mapV2": true]' },
       { k: 'last.sync.anchor', v: '2026-11-13 08:41:22 +0000' },
@@ -2336,13 +2891,13 @@ html[data-theme="dark"] .shot { box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) in
       { k: 'device.push.token', v: 'Data · 32 bytes' },
       { k: 'profile.avatar.style', v: 'gradient' }
     ]},
-    { title: 'globalDomain', items: [
+    { titleKey: 'userdefaults.domain.global', items: [
       { k: 'AppleLanguages', v: '[en, zh-Hans]' },
       { k: 'AppleLocale', v: 'en_US' },
       { k: 'NSInterfaceStyle', v: 'macintosh' },
       { k: 'AppleICUForce24HourTime', v: '1' }
     ]},
-    { title: 'Other Domains', items: [
+    { titleKey: 'userdefaults.domain.other', items: [
       { k: 'com.apple.keyboard.lastUsed', v: 'en_US@sw=QWERTY' },
       { k: 'NSNavLastRootDirectory', v: '~/Documents' }
     ]}
@@ -2366,7 +2921,7 @@ html[data-theme="dark"] .shot { box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) in
         });
         if (!items.length) return '';
         count += items.length;
-        return '<p class="sec-title">' + esc(section.title) + '</p><div class="card">' +
+        return '<p class="sec-title">' + esc(t(section.titleKey)) + '</p><div class="card">' +
           items.map(function (item) {
             return '<button class="row row--tap ud-row" type="button" data-key="' + esc(item.k) + '">' +
               '<span class="row-text"><span class="row-title">' + esc(item.k) +
@@ -2401,6 +2956,8 @@ html[data-theme="dark"] .shot { box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) in
       plain.classList.add('is-pushed');
       main.classList.remove('is-behind');
     });
+
+    refreshUserDefaults = render;
   }
 
   /* ----------------------------------------------------------
@@ -2416,8 +2973,13 @@ html[data-theme="dark"] .shot { box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) in
             text: 'Incident Identifier: 5F31-8C20\nCrashReporter Key:   8f2c1d4a9e4c21b7\nProcess:             Atlas [1284]\nException Type:      EXC_BAD_ACCESS (SIGSEGV)\nCrashed Thread:      0\n' }
         ]},
         { name: 'Exports', kind: 'folder', children: [] },
+        { name: 'Images', kind: 'folder', children: [
+          { name: 'hero.webp', kind: 'file', size: '84 KB' },
+          { name: 'avatar.png', kind: 'file', size: '32 KB' }
+        ]},
         { name: 'notes.md', kind: 'file', size: '2 KB',
           text: '# Kyoto\n\n- Fushimi Inari at 7:00\n- Arashiyama bamboo grove\n- Dinner in Pontocho\n' },
+        { name: 'draft.txt', kind: 'file', size: '1 KB', text: 'Packing list\n- Camera\n- Passport\n- Walking shoes\n' },
         { name: 'session.json', kind: 'file', size: '1.2 KB',
           text: '{\n  "startedAt": "2026-11-13T10:24:31Z",\n  "duration": 412,\n  "frames": 3582\n}' }
       ]},
@@ -2447,7 +3009,7 @@ html[data-theme="dark"] .shot { box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) in
     var sheet = $('#sbSheet');
     var sheetTitle = $('#sbSheetTitle');
     var sheetFile = null;
-    var path = [];
+    var path = ['Documents'];
 
     function nodeAtPath() {
       var node = sandboxRoot;
@@ -2460,7 +3022,7 @@ html[data-theme="dark"] .shot { box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) in
     }
 
     function renderPath() {
-      var crumbs = [{ name: 'Sandbox', depth: 0 }].concat(path.map(function (name, index) {
+      var crumbs = [{ name: t('sandbox.root'), depth: 0 }].concat(path.map(function (name, index) {
         return { name: name, depth: index + 1 };
       }));
       pathEl.innerHTML = crumbs.map(function (crumb, index) {
@@ -2476,7 +3038,7 @@ html[data-theme="dark"] .shot { box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) in
       renderPath();
       var children = node.children || [];
       if (!children.length) {
-        listEl.innerHTML = '<div class="empty-state">Empty Folder</div>';
+        listEl.innerHTML = '<div class="empty-state">' + esc(t('sandbox.empty')) + '</div>';
         return;
       }
       listEl.innerHTML = children.map(function (child, index) {
@@ -2518,7 +3080,7 @@ html[data-theme="dark"] .shot { box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) in
     });
 
     function fullPath(file) {
-      return '/var/mobile/Containers/Data/Application/8F2C1D4A/Documents/' + path.concat(file.name).join('/');
+      return '/var/mobile/Containers/Data/Application/8F2C1D4A/' + path.concat(file.name).join('/');
     }
 
     function showSheet(file) {
@@ -2536,7 +3098,7 @@ html[data-theme="dark"] .shot { box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) in
       var file = sheetFile;
       hideSheet();
       if (!file) return;
-      if (!file.text) { toast('No preview available'); return; }
+      if (!file.text) { toast(t('sandbox.no_preview')); return; }
       previewTitle.textContent = file.name;
       previewText.textContent = file.text;
       previewText.scrollTop = 0;
@@ -2545,13 +3107,13 @@ html[data-theme="dark"] .shot { box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) in
     });
     $('#sbShareBtn').addEventListener('click', function () {
       hideSheet();
-      toast('Sharing is disabled in this preview');
+      toast(t('sandbox.share_disabled'));
     });
     $('#sbCopyBtn').addEventListener('click', function () {
       if (!sheetFile) return;
       copyText(fullPath(sheetFile));
       hideSheet();
-      toast('Path copied');
+      toast(t('sandbox.path_copied'));
     });
     $('#sbCancelBtn').addEventListener('click', hideSheet);
     backdrop.addEventListener('click', hideSheet);
@@ -2560,6 +3122,7 @@ html[data-theme="dark"] .shot { box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) in
       main.classList.remove('is-behind');
     });
 
+    refreshSandbox = renderList;
     renderList();
   }
 
@@ -2582,9 +3145,9 @@ html[data-theme="dark"] .shot { box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) in
     var unitEl = $('#perfUnit');
 
     var metrics = [
-      { name: 'FPS', unit: 'fps', base: 58.5, min: 52, max: 60, jitter: 1.6, tint: '#0a84ff' },
-      { name: 'CPU', unit: '%', base: 23, min: 0, max: 60, jitter: 3.2, tint: '#ff9500' },
-      { name: 'Memory', unit: 'MB', base: 184, min: 150, max: 512, jitter: 4.5, tint: '#34c759' }
+      { nameKey: 'perf.metric.fps', unit: 'fps', base: 58.5, min: 52, max: 60, jitter: 1.6, tint: '#0a84ff' },
+      { nameKey: 'perf.metric.cpu', unit: '%', base: 23, min: 0, max: 60, jitter: 3.2, tint: '#ff9500' },
+      { nameKey: 'perf.metric.memory', unit: 'MB', base: 184, min: 150, max: 512, jitter: 4.5, tint: '#34c759' }
     ];
     var series = metrics.map(function (metric) {
       var value = metric.base;
@@ -2614,7 +3177,7 @@ html[data-theme="dark"] .shot { box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) in
       }).join(' ');
       line.setAttribute('d', path);
       fill.setAttribute('d', path + ' L' + width + ' ' + height + ' L0 ' + height + ' Z');
-      nameEl.textContent = metric.name;
+      nameEl.textContent = t(metric.nameKey);
       valueEl.textContent = String(Math.round(values[values.length - 1]));
       unitEl.textContent = metric.unit;
       float.style.setProperty('--tint', metric.tint);
@@ -2713,6 +3276,8 @@ html[data-theme="dark"] .shot { box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) in
         cycle();
       }
     });
+
+    refreshPerf = draw;
   }
 
   /* ----------------------------------------------------------
@@ -2720,7 +3285,7 @@ html[data-theme="dark"] .shot { box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) in
      ---------------------------------------------------------- */
   var hsData = {
     properties: [
-      { title: 'UIView', rows: [
+      { titleKey: 'hs.sec.uiView', rows: [
         { t: 'contentMode', v: 'Scale To Fill', chev: true },
         { t: 'tag', v: '0', chev: true },
         { t: 'isUserInteractionEnabled', switch: true },
@@ -2732,14 +3297,14 @@ html[data-theme="dark"] .shot { box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) in
         { t: 'isHidden', switch: false },
         { t: 'clipsToBounds', switch: true }
       ]},
-      { title: 'Object', rows: [
+      { titleKey: 'hs.sec.object', rows: [
         { t: 'viewController.class', d: 'ProfileViewController' },
         { t: 'class', d: 'UIView', key: 'class' },
         { t: 'description', d: '<UIView: 0x105a2c8e0; frame = (16 284; 358 236); layer = <CALayer: 0x105a2cb40>>', mono: true, key: 'desc' }
       ]}
     ],
     layer: [
-      { title: 'Drawing', rows: [
+      { titleKey: 'hs.sec.drawing', rows: [
         { t: 'layer.class', d: 'CALayer' },
         { t: 'cornerRadius', v: '18', chev: true },
         { t: 'cornerCurve', v: 'Continuous', chev: true },
@@ -2750,17 +3315,17 @@ html[data-theme="dark"] .shot { box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) in
         { t: 'shadowRadius', v: '24', chev: true },
         { t: 'shadowPath', v: 'nil' }
       ]},
-      { title: 'Transform', rows: [
+      { titleKey: 'hs.sec.transform', rows: [
         { t: 'position', v: '{195.0, 402.0}', chev: true },
         { t: 'anchorPoint', v: '{0.5, 0.5}', chev: true },
         { t: 'zPosition', v: '0', chev: true },
         { t: 'transform', v: '1.0, 0.0, 0.0, 1.0, 0.0, 0.0', chev: true },
         { t: 'transform3D', d: 'identity' }
       ]},
-      { title: 'Animations', rows: [
+      { titleKey: 'hs.sec.animations', rows: [
         { t: 'animationKeys', d: 'none' }
       ]},
-      { title: 'Diagnostics', rows: [
+      { titleKey: 'hs.sec.diagnostics', rows: [
         { t: 'contentsScale', v: '3', chev: true },
         { t: 'contentsGravity', v: 'resize', chev: true },
         { t: 'shouldRasterize', d: 'false' },
@@ -2768,7 +3333,7 @@ html[data-theme="dark"] .shot { box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) in
       ]}
     ],
     layout: [
-      { title: 'Common', rows: [
+      { titleKey: 'hs.sec.common', rows: [
         { t: 'frame', v: '{16, 284, 358, 236}', chev: true, key: 'frame' },
         { t: 'bounds', v: '{0, 0, 358, 236}', chev: true },
         { t: 'center', v: '{195, 402}', chev: true },
@@ -2776,19 +3341,19 @@ html[data-theme="dark"] .shot { box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) in
         { t: 'contentHuggingPriority', v: '{251, 251}', chev: true },
         { t: 'contentCompressionResistancePriority', v: '{750, 750}', chev: true }
       ]},
-      { title: 'Constraints', rows: [
+      { titleKey: 'hs.sec.constraints', rows: [
         { t: 'UIView.width == 358.0  ·  @1000  ·  active', chev: true },
         { t: 'UIView.leading == UIScrollView.leading + 16.0  ·  @1000', chev: true },
         { t: 'UIView.trailing == UIScrollView.trailing − 16.0  ·  @1000', chev: true },
         { t: 'UIView.height == 236.0  ·  @750', chev: true },
         { t: 'UIView.top == UILabel.bottom + 16.0  ·  @1000  ·  inactive', chev: true }
       ]},
-      { title: 'Diagnostics', rows: [
+      { titleKey: 'hs.sec.diagnostics', rows: [
         { t: 'intrinsicContentSize', v: '{358, 236}' },
         { t: 'hasAmbiguousLayout', d: 'false' },
         { t: 'constraintsAffectingLayout', v: 'H 12 · V 9' }
       ]},
-      { title: 'Effective Values', rows: [
+      { titleKey: 'hs.sec.effective', rows: [
         { t: 'layoutMargins', v: '{16, 16, 16, 16}', chev: true },
         { t: 'layoutMarginsGuide', v: '{16, 16, 358, 236}' },
         { t: 'safeAreaInsets', v: '{59, 0, 34, 0}' },
@@ -2799,7 +3364,7 @@ html[data-theme="dark"] .shot { box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) in
         { t: 'preservesSuperviewLayoutMargins', d: 'false' },
         { t: 'insetsLayoutMarginsFromSafeArea', d: 'true' }
       ]},
-      { title: 'Traits & RTL', rows: [
+      { titleKey: 'hs.sec.traits', rows: [
         { t: 'semanticContentAttribute', v: 'Unspecified' },
         { t: 'directionalLayoutMargins', v: '{16, 16, 16, 16}' },
         { t: 'effectiveUserInterfaceLayoutDirection', v: 'Left to Right' },
@@ -2996,7 +3561,7 @@ html[data-theme="dark"] .shot { box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) in
         var panel = $('.seg-panel[data-seg="' + key + '"]', detailScroll);
         if (!panel) return;
         panel.innerHTML = hsData[key].map(function (section) {
-          return '<p class="sec-title">' + esc(section.title) + '</p><div class="card">' +
+          return '<p class="sec-title">' + esc(t(section.titleKey)) + '</p><div class="card">' +
             section.rows.map(detailRow).join('') + '</div>';
         }).join('');
       });
@@ -3056,7 +3621,7 @@ html[data-theme="dark"] .shot { box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) in
       treeRowsEl.innerHTML = treeRows.map(function (row, index) {
         var hasKids = row.open !== undefined;
         var twisty = hasKids ? '<span class="tree-twisty"><svg><use href="#i-chev-' + (row.open ? 'd' : 'r') + '"/></svg></span>' : '<span class="tree-twisty"></span>';
-        var focus = index === treeIndex ? '<button class="focus-pill" type="button" data-index="' + index + '">Focus</button>' : '';
+        var focus = index === treeIndex ? '<button class="focus-pill" type="button" data-index="' + index + '">' + esc(t('hs.focus')) + '</button>' : '';
         return '<div class="tree-row' + (index === treeIndex ? ' is-focused' : '') + '" role="button" tabindex="0" data-index="' + index + '" style="padding-left:' + (12 + row.d * 13) + 'px">' +
           twisty +
           '<span class="tree-name' + (row.dim ? ' is-dim' : '') + '">' + esc(row.n) + '</span>' +
@@ -3145,6 +3710,11 @@ html[data-theme="dark"] .shot { box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) in
         if (!scale) return;
       }, 80);
     });
+
+    refreshHierarchy = function () {
+      renderDetail();
+      renderTree();
+    };
   }
 
   /* ----------------------------------------------------------
@@ -3177,6 +3747,7 @@ html[data-theme="dark"] .shot { box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) in
   initPerf();
   initHierarchy();
   initReveal();
+  applyLanguage(false);
 })();
 </script>
 </body>

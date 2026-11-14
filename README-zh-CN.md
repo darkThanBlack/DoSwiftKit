@@ -105,8 +105,8 @@ DO.ConsolePlugin.shared.start()
   * [x] 重新设计编辑 UI 和可编辑属性
   * [x] frame / bounds / center 可编辑，复用同一套编辑器
   * [x] 约束展示，支持修改 constant / priority
-* [ ] 重新设计父子节点展示与切换交互
-* [ ] 具体业务字段需要逐一检查并补强
+* [x] 重新设计父子节点展示与切换交互
+* [x] 具体业务字段需要逐一检查并补强
 
 #### 性能
 

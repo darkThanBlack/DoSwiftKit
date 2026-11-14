@@ -103,8 +103,8 @@ DO.ConsolePlugin.shared.start()
   * [x] Redesigned the editor UI and the set of editable properties
   * [x] Frame / bounds / center editing, through the same editor as every other value
   * [x] Constraint inspection, with constant / priority editing
-* [ ] Redesign parent / child navigation
-* [ ] Audit business-specific fields one by one
+* [x] Redesign parent / child navigation
+* [x] Audit business-specific fields one by one
 
 #### Performance
 

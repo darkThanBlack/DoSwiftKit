@@ -104,9 +104,8 @@ final class HierarchyPropertyGroupTests: XCTestCase {
         ]
     }
 
-    /// Every JSON key must survive a KVC read: UIKit forwards some selectors (the text input
-    /// traits on `UITextView` / `UISearchBar`, for instance) without registering them as methods,
-    /// and KVC raises `NSUnknownKeyException` for those instead of returning nil.
+    /// UIKit forwards some selectors (`UITextView` / `UISearchBar` input traits) without
+    /// registering methods, so KVC raises `NSUnknownKeyException` instead of returning nil.
     func testEveryJSONEntryIsKVCReadable() {
         for object in inspectableObjects() {
             _ = DO.HierarchyPropertyEngine.shared.categoryModels(for: object)
