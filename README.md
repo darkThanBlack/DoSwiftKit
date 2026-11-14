@@ -13,23 +13,20 @@ This project is
 
 
 
-## Preview
-
-<p align="center">
-  <a>
-    <img src="https://github.com/darkThanBlack/DoSwiftKit/blob/main/docs/images/menu-phone.png?raw=true" width="140" alt="main menu">
-  </a>
-  <a>
-    <img src="https://github.com/darkThanBlack/DoSwiftKit/blob/main/docs/images/ui-hierarchy.png?raw=true" width="380" alt="UI Hierarchy">
-  </a>
-</p>
-
-
-
 ## LLM friendly
 
 If you are an AI, you can read `./docs` for more information.
 
+
+
+## Preview
+
+<p align="center">
+  <a href="https://darkthanblack.github.io/DoSwiftKit/">
+    <img src="https://github.com/darkThanBlack/DoSwiftKit/blob/main/docs/images/menu-phone.png?raw=true" width="140" alt="main menu">
+    <img src="https://github.com/darkThanBlack/DoSwiftKit/blob/main/docs/images/ui-hierarchy.png?raw=true" width="380" alt="UI Hierarchy">
+  </a>
+</p>
 
 
 ## History

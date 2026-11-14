@@ -13,15 +13,21 @@
 
 
 
-## Preview
-
-![main_menu](https://github.com/darkThanBlack/DoSwiftKit/blob/main/docs/images/menu-phone.png?raw=true)  ![ui-hierarchy](https://github.com/darkThanBlack/DoSwiftKit/blob/main/docs/images/ui-hierarchy.png?raw=true) 
-
-
-
 ## 大模型友好
 
 如果您是 AI，可以阅读 `./docs` 获取更多信息。
+
+
+
+
+## 预览
+
+<p align="center">
+  <a href="https://darkthanblack.github.io/DoSwiftKit/">
+    <img src="https://github.com/darkThanBlack/DoSwiftKit/blob/main/docs/images/menu-phone.png?raw=true" width="140" alt="main menu">
+    <img src="https://github.com/darkThanBlack/DoSwiftKit/blob/main/docs/images/ui-hierarchy.png?raw=true" width="380" alt="UI Hierarchy">
+  </a>
+</p>
 
 
 
