@@ -35,6 +35,15 @@ Small patches were never going to be enough for a project this old and this Obje
 
 ## Release
 
+#### 1.1.0
+
+November 2026
+
+* The detail page is split into Properties, Layer and Layout, backed by a code layer plus a JSON definition
+* A full-screen view tree replaces stepping through parent / child sheets — breadcrumb, focus, configurable root depth
+* Numeric editors take preset chips; read-only rows copy their value
+* JSON coverage reaches 281 properties, including UIScrollView geometry and `UIWindow.windowLevel`
+
 #### 1.0.0
 
 November 2026
@@ -51,19 +60,19 @@ November 2026
 ```ruby
 # pod trunk archived, use private spec:
 # source 'https://github.com/CocoaPods/Specs.git'
-# pod 'DoSwiftKit', '1.0.0'
+# pod 'DoSwiftKit', '1.1.0'
 
 # or:
 pod 'DoSwiftKit',
   :git => 'https://github.com/darkThanBlack/DoSwiftKit.git',
   :branch => 'main',
-  :tag => '1.0.0'
+  :tag => '1.1.0'
 ```
 
 #### SwiftPM
 
 ```swift
-.package(url: "https://github.com/darkThanBlack/DoSwiftKit.git", from: "1.0.0")
+.package(url: "https://github.com/darkThanBlack/DoSwiftKit.git", from: "1.1.0")
 ```
 
 

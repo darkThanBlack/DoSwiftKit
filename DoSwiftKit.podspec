@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'DoSwiftKit'
-  s.version          = '1.0.0'
+  s.version          = '1.1.0'
   s.summary          = 'Pure, clean Swift debug toolkit with live view inspection, etc. | 纯粹、整洁的 Swift 调试工具包，支持实时视图检查等功能'
   
   s.description      = <<-DESC

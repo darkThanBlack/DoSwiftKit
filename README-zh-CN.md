@@ -37,6 +37,15 @@
 
 ## 发布
 
+#### 1.1.0
+
+2026.11
+
+* 详情页拆成属性 / 图层 / 布局三段，代码层加 JSON 定义共同驱动
+* 全屏视图树替代逐级翻父 / 子视图，支持面包屑、聚焦与可配置的起始层级
+* 数值输入支持预设快捷值，只读行点击可复制
+* JSON 属性扩展到 281 个，补齐 UIScrollView 几何、`UIWindow.windowLevel` 等
+
 #### 1.0.0 
 
 2026.11
@@ -53,19 +62,19 @@
 ```ruby
 # pod trunk 已是历史绝唱, 支持使用私有 spec
 # source 'https://github.com/CocoaPods/Specs.git'
-# pod 'DoSwiftKit', '1.0.0'
+# pod 'DoSwiftKit', '1.1.0'
 
 # 不用 source, 直接指定
 pod 'DoSwiftKit',
   :git => 'https://github.com/darkThanBlack/DoSwiftKit.git',
   :branch => 'main',
-  :tag => '1.0.0'
+  :tag => '1.1.0'
 ```
 
 #### SwiftPM
 
 ```swift
-.package(url: "https://github.com/darkThanBlack/DoSwiftKit.git", from: "1.0.0")
+.package(url: "https://github.com/darkThanBlack/DoSwiftKit.git", from: "1.1.0")
 ```
 
 
