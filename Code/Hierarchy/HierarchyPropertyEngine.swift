@@ -2,7 +2,7 @@
 //  HierarchyPropertyEngine.swift
 //  DoSwift
 //
-//  Created by Claude on 2026/10/31
+//  Created by moonShadow on 2026/10/31
 //  Copyright © 2026 darkThanBlack. All rights reserved.
 //
 //  LICENSE: SAME AS REPOSITORY

@@ -2,8 +2,8 @@
 //  DefaultPlugin.swift
 //  DoSwift
 //
-//  Created by moonShadow on 2026/11/2
-//
+//  Created by moonShadow on 2026/11/02
+//  Copyright © 2026 darkThanBlack. All rights reserved.
 //
 //  LICENSE: SAME AS REPOSITORY
 //  Contact me: [GitHub](https://github.com/darkThanBlack)

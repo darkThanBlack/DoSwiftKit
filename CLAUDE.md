@@ -78,6 +78,8 @@ xcconfig 一起抹掉，表现是 `Unable to find module dependency: 'DoSwift'`�
 - **外观**：语义色（`.label` / `.secondaryLabel` / `systemBackground`）+ `.preferredFont`；
   cell 一律自绘——iOS 13 上 `textLabel` / `detailTextLabel` 已弃用，用系统 cell 等于踩弃用公告。
 - **注释**：一律英文，一到两行；只写「为什么」，不复述代码。
+- **文件头**：沿用仓库模板十行（文件名 / DoSwift / `Created by moonShadow on yyyy/MM/dd` /
+  Copyright © 创建年份 / LICENSE / Contact me），日期是创建日期，作者固定 moonShadow，空行照抄
 
 ## Hierarchy：代码 + JSON 两层
 
