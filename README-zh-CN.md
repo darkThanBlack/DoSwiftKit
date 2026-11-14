@@ -146,3 +146,6 @@ DO.ConsolePlugin.shared.start()
 
 
 
+## 特别感谢
+
+根据 [PR309](https://github.com/didi/DoKit/pull/309)，有理由认为是 [HDB-Li](https://github.com/HDB-Li) 在原始的 OC 时代开发了视图检查功能的原始版本，这在当时是一个 heavy 且 dirty 的 work，特此感谢。
