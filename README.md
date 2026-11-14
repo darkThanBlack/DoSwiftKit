@@ -39,10 +39,8 @@ Small patches were never going to be enough for a project this old and this Obje
 
 November 2026
 
-* The detail page is split into Properties, Layer and Layout, backed by a code layer plus a JSON definition
-* A full-screen view tree replaces stepping through parent / child sheets — breadcrumb, focus, configurable root depth
-* Numeric editors take preset chips; read-only rows copy their value
-* JSON coverage reaches 281 properties, including UIScrollView geometry and `UIWindow.windowLevel`
+* Basic display and editing of constraints are now supported.
+* The entire view tree can be displayed directly.
 
 #### 1.0.0
 

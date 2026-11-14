@@ -1030,6 +1030,7 @@ html[data-theme="dark"] .hs-badge { color: #ffb340; }
 }
 .tree-path::-webkit-scrollbar { display: none; }
 .tree-path .crumb { font-size: 10.5px; }
+.tree-path svg { width: 8px; height: 8px; flex: none; color: var(--ios-label3); }
 .tree-list { flex: 1; min-height: 0; overflow-y: auto; scrollbar-width: none; padding: 4px 0 24px; }
 .tree-list::-webkit-scrollbar { display: none; }
 .tree-row {
@@ -1124,6 +1125,11 @@ html[data-theme="dark"] .shot { box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) in
   gap: clamp(22px, 4vw, 56px); padding-top: 10px;
 }
 .duo .device { width: min(340px, 44%); max-width: 340px; }
+.trio {
+  display: flex; justify-content: center; align-items: flex-start;
+  gap: clamp(18px, 2.4vw, 32px); padding-top: 10px;
+}
+.trio .device { width: min(300px, calc((100% - 64px) / 3)); max-width: 300px; }
 .flash { animation: flashRing 1.25s cubic-bezier(.2, .8, .2, 1); }
 @keyframes flashRing {
   0% { box-shadow: 0 0 0 0 rgba(10, 132, 255, 0.55), 0 1px 0 rgba(255, 255, 255, 0.35) inset; }
@@ -1223,6 +1229,10 @@ html.js .reveal.in { opacity: 1; transform: none; }
   .shot--wide { grid-column: 1 / -1; }
   .hero { grid-template-columns: minmax(0, 1fr) minmax(300px, 370px); gap: 40px; }
 }
+@media (max-width: 1040px) {
+  .trio { flex-wrap: wrap; }
+  .trio .device { width: min(300px, calc((100% - 28px) / 2)); max-width: 300px; }
+}
 @media (max-width: 860px) {
   .hero { grid-template-columns: 1fr; min-height: 0; padding-top: 54px; gap: 54px; }
   .hero-copy { max-width: 720px; }
@@ -1237,9 +1247,9 @@ html.js .reveal.in { opacity: 1; transform: none; }
   .shot { padding: 14px 14px 18px; border-radius: 24px; }
   .shot > .device { max-width: 340px; width: 100%; }
   .shot-hint { display: none; }
-  .duo { flex-direction: column; align-items: center; gap: 22px; }
-  .duo .device { width: min(340px, 100%); max-width: 340px; }
-  .shot--wide .duo { padding-top: 8px; }
+  .duo, .trio { flex-direction: column; align-items: center; gap: 22px; }
+  .duo .device, .trio .device { width: min(340px, 100%); max-width: 340px; }
+  .shot--wide .duo, .shot--wide .trio { padding-top: 8px; }
   .footer-bottom .spacer { display: none; }
 }
 @media (max-width: 560px) {
@@ -1453,7 +1463,7 @@ html.js .reveal.in { opacity: 1; transform: none; }
           <div class="shot-meta"><h3 data-i18n="hierarchy.title">UI Hierarchy</h3><p data-i18n="shot.hierarchy.sub">Pick, measure, edit — live</p></div>
           <span class="shot-hint" data-i18n="shot.hierarchy.hint">Picker · ruler · live edits</span>
         </header>
-        <div class="duo">
+        <div class="trio">
 
           <!-- picker -->
           <div class="device">
@@ -1525,40 +1535,42 @@ html.js .reveal.in { opacity: 1; transform: none; }
             </div>
           </div>
 
-          <!-- detail / tree -->
+          <!-- tree -->
           <div class="device">
-            <div class="device__screen" id="hsRightScreen" data-bg="grouped">
-              <div class="tool hs-right" id="hsRight">
-                <div class="view hs-detail-tool" id="hsDetail">
-                  <div class="navbar">
-                    <button class="nav-btn" type="button" aria-label="Close"><svg><use href="#i-x"/></svg></button>
-                    <div class="segmented" id="hsSegments" role="tablist" aria-label="Detail sections">
-                      <button class="seg is-active" type="button" data-seg="properties" role="tab" data-i18n="hs.seg.properties">Properties</button>
-                      <button class="seg" type="button" data-seg="layer" role="tab" data-i18n="hs.seg.layer">Layer</button>
-                      <button class="seg" type="button" data-seg="layout" role="tab" data-i18n="hs.seg.layout">Layout</button>
-                    </div>
-                    <span></span>
-                  </div>
-                  <div class="scroll grouped" id="hsDetailScroll">
-                    <div class="seg-panel is-active" data-seg="properties"></div>
-                    <div class="seg-panel" data-seg="layer"></div>
-                    <div class="seg-panel" data-seg="layout"></div>
-                  </div>
+            <div class="device__screen" id="hsTreeScreen">
+              <div class="tool tree-tool" id="hsTree">
+                <div class="navbar">
+                  <button class="nav-btn" type="button" aria-label="Close"><svg><use href="#i-x"/></svg></button>
+                  <span class="nav-title" data-i18n="hs.tree_title">View Tree</span>
+                  <span></span>
                 </div>
-
-                <div class="view tree-tool is-pushed" id="hsTree">
-                  <div class="navbar">
-                    <button class="nav-btn" type="button" aria-label="Close"><svg><use href="#i-x"/></svg></button>
-                    <span class="nav-title" data-i18n="hs.tree_title">View Tree</span>
-                    <span></span>
-                  </div>
-                  <div class="tree-path" id="hsTreePath"></div>
-                  <div class="tree-list" id="hsTreeRows"></div>
-                </div>
+                <div class="tree-path" id="hsTreePath"></div>
+                <div class="tree-list" id="hsTreeRows"></div>
               </div>
             </div>
           </div>
 
+          <!-- detail -->
+          <div class="device">
+            <div class="device__screen" id="hsDetailScreen" data-bg="grouped">
+              <div class="tool hs-detail-tool" id="hsDetail">
+                <div class="navbar">
+                  <button class="nav-btn" type="button" aria-label="Close"><svg><use href="#i-x"/></svg></button>
+                  <div class="segmented" id="hsSegments" role="tablist" aria-label="Detail sections">
+                    <button class="seg is-active" type="button" data-seg="properties" role="tab" data-i18n="hs.seg.properties">Properties</button>
+                    <button class="seg" type="button" data-seg="layer" role="tab" data-i18n="hs.seg.layer">Layer</button>
+                    <button class="seg" type="button" data-seg="layout" role="tab" data-i18n="hs.seg.layout">Layout</button>
+                  </div>
+                  <span></span>
+                </div>
+                <div class="scroll grouped" id="hsDetailScroll">
+                  <div class="seg-panel is-active" data-seg="properties"></div>
+                  <div class="seg-panel" data-seg="layer"></div>
+                  <div class="seg-panel" data-seg="layout"></div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </figure>
 
@@ -3403,9 +3415,6 @@ DO.Core.shared.setup(appScene: window?.windowScene, appWindow: window)
     var edgeR = $('#hsEdgeR');
     var edgeT = $('#hsEdgeT');
     var edgeB = $('#hsEdgeB');
-    var rightScreen = $('#hsRightScreen');
-    var detailView = $('#hsDetail');
-    var treeView = $('#hsTree');
     var detailScroll = $('#hsDetailScroll');
     var treeRowsEl = $('#hsTreeRows');
     var treePathEl = $('#hsTreePath');
@@ -3602,21 +3611,6 @@ DO.Core.shared.setup(appScene: window?.windowScene, appWindow: window)
       });
     });
 
-    function showTree(withIndex) {
-      if (typeof withIndex === 'number') {
-        treeIndex = withIndex;
-        renderTree();
-      }
-      detailView.classList.add('is-behind');
-      treeView.classList.remove('is-pushed');
-      rightScreen.removeAttribute('data-bg');
-    }
-    function showDetail() {
-      treeView.classList.add('is-pushed');
-      detailView.classList.remove('is-behind');
-      rightScreen.setAttribute('data-bg', 'grouped');
-    }
-
     function renderTree() {
       treeRowsEl.innerHTML = treeRows.map(function (row, index) {
         var hasKids = row.open !== undefined;
@@ -3635,6 +3629,7 @@ DO.Core.shared.setup(appScene: window?.windowScene, appWindow: window)
         return (index === 0 ? '' : '<svg><use href="#i-chev-r"/></svg>') +
           '<span class="crumb' + (isCurrent ? ' is-current' : '') + '">' + esc(name) + '</span>';
       }).join('');
+      treePathEl.scrollLeft = treePathEl.scrollWidth;
     }
 
     treeRowsEl.addEventListener('click', function (event) {
@@ -3650,7 +3645,6 @@ DO.Core.shared.setup(appScene: window?.windowScene, appWindow: window)
           };
           updateDetailData();
           renderDetail();
-          showDetail();
         }
         return;
       }
@@ -3676,13 +3670,15 @@ DO.Core.shared.setup(appScene: window?.windowScene, appWindow: window)
         if (action === 'detail') {
           updateDetailData();
           renderDetail();
-          showDetail();
         } else if (action === 'parents') {
-          showTree(6);
+          treeIndex = 6;
+          renderTree();
         } else if (action === 'children') {
-          showTree(10);
+          treeIndex = 10;
+          renderTree();
         } else {
-          showTree();
+          treeIndex = 9;
+          renderTree();
         }
       });
     });
