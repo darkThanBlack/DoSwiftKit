@@ -2,7 +2,7 @@
 
 [![Version](https://img.shields.io/github/v/tag/darkThanBlack/DoSwiftKit?label=version)](#)  [![iOS](https://img.shields.io/badge/iOS-13.0%2B-blue.svg)](#)  [![Swift](https://img.shields.io/badge/Swift-5.9%2B-orange.svg)](#)
 
-**English** | [简体中文](https://github.com/darkThanBlack/DoSwiftKit/README-zh-CN.md)
+**English** | [简体中文](https://github.com/darkThanBlack/DoSwiftKit/blob/main/README-zh-CN.md)
 
 ## Intro
 
@@ -10,6 +10,12 @@ This project is
 
 * a clean, pure Swift debugging toolkit — live view inspection and a good deal more
 * my own complete redesign and rewrite of [DoKit](https://github.com/didi/DoKit)
+
+
+
+## Preview
+
+![main_menu](https://github.com/darkThanBlack/DoSwiftKit/blob/main/docs/images/menu-phone.png?raw=true)   ![ui-hierarchy](https://github.com/darkThanBlack/DoSwiftKit/blob/main/docs/images/ui-hierarchy.png?raw=true)
 
 
 

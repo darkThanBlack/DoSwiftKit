@@ -2,7 +2,7 @@
 
 [![Version](https://img.shields.io/github/v/tag/darkThanBlack/DoSwiftKit?label=version)](#)  [![iOS](https://img.shields.io/badge/iOS-13.0%2B-blue.svg)](#)  [![Swift](https://img.shields.io/badge/Swift-5.9%2B-orange.svg)](#)
 
-[English](https://github.com/darkThanBlack/DoSwiftKit/README.md) | **简体中文**
+[English](https://github.com/darkThanBlack/DoSwiftKit/blob/main/README.md) | **简体中文**
 
 ## 简介
 
@@ -10,6 +10,12 @@
 
 * 一个纯粹、整洁的 Swift 调试工具包，支持实时视图检查等多种功能
 * 由我个人推进的，对 [DoKit](https://github.com/didi/DoKit) 的彻底重新设计和实现
+
+
+
+## Preview
+
+![main_menu](https://github.com/darkThanBlack/DoSwiftKit/blob/main/docs/images/menu-phone.png?raw=true)  ![ui-hierarchy](https://github.com/darkThanBlack/DoSwiftKit/blob/main/docs/images/ui-hierarchy.png?raw=true) 
 
 
 
